@@ -304,7 +304,7 @@ for centroid_ii=1:centroid_count % now loop over all valid centroids
         % hazard.intensity(track_i,:)     = res.gust; 
         
         % CHANGES TO WINDFIELD original code   ------------------
-        % from tc_surge_hazard_create 
+        % from climada_ts_hazard_set 
         arr_nonzero=find(res.gust); % to avoid de-sparsify all elements
         res.surge(arr_nonzero)=0.1023*(max(res.gust(arr_nonzero)-26.8224,0))+1.8288; % m/s converted to m surge height
         % ------------------------------------------------------- 
