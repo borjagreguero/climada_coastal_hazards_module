@@ -60,7 +60,7 @@ dy(1:find(dx==0))  = -dy(1:find(dx==0));
 
 % grid in m, centered in storm 
 [xx,yy] = meshgrid (dx,dy);  % LOCAL GRID FOR tc_track position in cart (km) 
-[TH,r]=cart2pol(xx,yy); 
+[TH,r]  = cart2pol(xx,yy); 
 
 %     beta=TH; % angle to center 
 wind.xx = xx; % in cart 
@@ -78,6 +78,10 @@ wind.r = r;
 WW=tc_track.MaxSustainedWind(track_node_i); 
 P0=tc_track.CentralPressure(track_node_i);
 PN=1013; 
+if P0>PN, 
+    wind.W = wind.xx.*nan; 
+    return , end % result in imaginary numbers 
+
 R=(0.4785.*P0-413.01); % ciclostrophic radious maximum winds 
 
 units_PR=tc_track.CentralPressureUnit; 
@@ -192,6 +196,8 @@ wind.Vf = Vf;
 wind.beta = beta; 
 wind.UR = UR; 
 wind.Fv = Fv; 
+
+wind.alfa_wind = alfa_wind; % angle in oxy reference 
 
 %%  GRAPHIC 
 if check_code

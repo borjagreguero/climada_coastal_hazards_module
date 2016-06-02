@@ -211,6 +211,8 @@ for track_node_i = 2:track_nodes_count%2:spatial_lag:track_nodes_count % loop ov
     WW=tc_track.MaxSustainedWind(track_node_i); 
     P0=tc_track.CentralPressure(track_node_i);
     PN=1013; 
+    if P0>PN, continue , end % results in imaginary numbers 
+
     R=(0.4785.*P0-413.01); % ciclostrophic radious maximum winds 
     R=0.9*R; % calibration factor 
     
@@ -474,7 +476,7 @@ for track_node_i = 2:track_nodes_count%2:spatial_lag:track_nodes_count % loop ov
             % check_code=0
         end
 
-        if check_plot & mod(track_node_i,10)==0
+        if check_plot & mod(track_node_i,3)==0
             close all 
             figure('Visible','on'), hold on
             %load coast.mat 

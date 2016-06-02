@@ -8,7 +8,6 @@ function [surgeheight]=fun_SurgeHeightFun(h0,u10,m,check_plot)
 %                                                     by: Arash Karimpour %
 %                                                   www.arashkarimpour.com%
 %+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++%
-% 
 %INPUT---------------------------------------------------------------------
 % Modeling the storm surge using Dean Dalrymple method 1992
 % 
@@ -17,12 +16,10 @@ function [surgeheight]=fun_SurgeHeightFun(h0,u10,m,check_plot)
 % m=0.00084;           % bed slope = h0/l; 
 % 
 %OUTPUT--------------------------------------------------------------------
-% 
 % surgeheight         : Surge Height in (m)
 % 
 %--------------------------------------------------------------------------
-% 
-% Borja G. Reguero 20160406 adapted for climada coastal module 
+% Borja G. Reguero 2016-04-06 adapted for climada coastal module 
 %-- 
 %%
 %--------------------------------------------------------------------------

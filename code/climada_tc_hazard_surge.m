@@ -293,18 +293,24 @@ for track_i=1002%:length(tc_track)
             bathy, models_waves, equal_timestep, silent_mode, check_plot,unit_,dirout); 
     end
     
-    % SAVE RESULTS 
+    % SAVE RESULTS only if any is not a NAN 
     if models_waves(1) 
-        hazard.Hs1(track_i,:)   = sparse(nanmax(resW.Hwaves1,[],2)); % fill hazard array
-        hazard.Tp1(track_i,:)   = sparse(nanmax(resW.Twaves1,[],2)); 
+        if 1-all(isnan(nanmax(resW.Hwaves1,[],2)))
+            hazard.Hs1(track_i,:)   = sparse(nanmax(resW.Hwaves1,[],2)); % fill hazard array
+            hazard.Tp1(track_i,:)   = sparse(nanmax(resW.Twaves1,[],2)); 
+        end
     end
     if models_waves(2)
-        hazard.Hs2(track_i,:)   = sparse(nanmax(resW.Hwaves2,[],2)); 
-        hazard.Tp2(track_i,:)   = sparse(nanmax(resW.Twaves2,[],2)); 
+        if 1-all(isnan(nanmax(resW.Hwaves2,[],2)))
+            hazard.Hs2(track_i,:)   = sparse(nanmax(resW.Hwaves2,[],2)); 
+            hazard.Tp2(track_i,:)   = sparse(nanmax(resW.Twaves2,[],2)); 
+        end
     end
     if models_waves(3) 
-        hazard.Hs3(track_i,:)   = sparse(nanmax(resW.Hwaves3,[],2)); 
-        hazard.Tp3(track_i,:)   = sparse(nanmax(resW.Twaves3,[],2)); 
+        if 1-all(isnan(nanmax(resW.Hwaves3,[],2)))
+            hazard.Hs3(track_i,:)   = sparse(nanmax(resW.Hwaves3,[],2)); 
+            hazard.Tp3(track_i,:)   = sparse(nanmax(resW.Twaves3,[],2)); 
+        end
     end 
         
     %------------------   CALCULATE SURGES ----------------------
