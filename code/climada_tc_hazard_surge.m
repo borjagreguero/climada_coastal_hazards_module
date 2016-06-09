@@ -194,7 +194,6 @@ hazard.arr              = spalloc(hazard.event_count,...
                                   length(hazard.lon),...
                                   ceil(hazard.event_count*length(hazard.lon)*hazard_arr_density));
 
-
 % initianialize
 if any(wave_models==1), 
     hazard.Hs1 = spalloc(hazard.event_count,length(hazard.lon),ceil(hazard.event_count*length(hazard.lon)*hazard_arr_density)); 
@@ -213,17 +212,17 @@ hazard.surgePr = spalloc(hazard.event_count,...
 if any(surge_models==1), hazard.surge1 = spalloc(hazard.event_count,...
                                   length(hazard.lon),...
                                   ceil(hazard.event_count*length(hazard.lon)*hazard_arr_density)); end 
-if any(surge_models==1), hazard.surge2 = spalloc(hazard.event_count,...
+if any(surge_models==2), hazard.surge2 = spalloc(hazard.event_count,...
                                   length(hazard.lon),...
                                   ceil(hazard.event_count*length(hazard.lon)*hazard_arr_density)); end 
-if any(surge_models==1), hazard.surge3 = spalloc(hazard.event_count,...
+if any(surge_models==3), hazard.surge3 = spalloc(hazard.event_count,...
                                   length(hazard.lon),...
                                   ceil(hazard.event_count*length(hazard.lon)*hazard_arr_density)); end 
 
 t0       = clock;
 msgstr   = sprintf('processing %i tracks',length(tc_track));
 fprintf('%s (updating waitbar with estimation of time remaining every 100th track)\n',msgstr);
-wbh      = waitbar(0,msgstr);
+if climada_global.waitbar, wbh = waitbar(0,msgstr);end
 mod_step = 10; % first time estimate after 10 tracks, then every 100
 
 % identify the sea centroids 
@@ -246,15 +245,27 @@ bathy.x=double(bathy0.x);
 bathy.y=double(bathy0.y); 
 bathy.h=double(bathy0.z); clear bathy0
 
-for track_i=1002%:length(tc_track)
+unit_='m'; 
+
+% create angcoast at centroids for CENAPRED surge model 
+% % % if any(surge_models==2) 
+% % %     coast0 = load(climada_global.coastline_file);
+% % %     coast.X=coast0.shapes.X; coast.Y=coast0.shapes.Y; 
+% % %     [centroids] = fun_angcoast_centroids(centroids,coast); 
+% % % end
+% 
+for track_i=1332%1:length(tc_track)
+%     disp(track_i) 
     % 1391 = IKE 
     
-    % --------------------------------------------------------------------
-    % Wave footprint of the track
-    equal_timestep=1; 
-    % silent_mode=0; 
-    check_plot=1; 
-    unit_='m'; 
+        % PASS IF IT HAS NO CENTRAL PRESSURE 
+    if all(isnan(tc_track(track_i).CentralPressure)==1), continue, end 
+    % ---------------------------------------------------------------------
+    % INTERNAL CONTROL PARAMETERS FOR TESTING CODE
+% % %     check_plot = 0; 
+% % %     silent_mode = 0; 
+    % ---------------------------------------------------------------------
+    
     res=[]; 
     
     % only calculate tracks within a region 
@@ -286,7 +297,10 @@ for track_i=1002%:length(tc_track)
 %     wind  = climada_tc_windfield_HURAC(tc_track_sim,10, 3); 
     
     %------------------   CALCULATE WAVES ----------------------
-	if any(wave_models)
+	if all(isnan(tc_track_sim.CentralPressure)==1), continue, end % storm not in area
+    if numel(tc_track_sim.CentralPressure)==1     , continue, end % only 1 position in area, interpolation fails below 
+        
+    if any(wave_models)
         disp('Obtaining WAVE footprints...')
         models_waves   = [1 1 1]; % [ Bretschneider (1990) / Young / SPM REVISED]
         resW = climada_tc_wavefield(tc_track_sim,centroids,...
@@ -323,7 +337,6 @@ for track_i=1002%:length(tc_track)
         
         %------------------
         disp(' -----  2) wind component...') 
-        
         % SS MODELS 
         % [ SLOSH regression, CENAPRED regr., Dean&Dalr.92 1D eq, Dean&Dalr.92 - with mean slope]
 
@@ -331,7 +344,9 @@ for track_i=1002%:length(tc_track)
         if any(surge_models==1) 
             disp('Model: SLOSH')
             res1 = climada_tc_hazard_surge_SLOSH(tc_track_sim,centroids,equal_timestep, silent_mode, check_plot); 
-            hazard.surge1(track_i,:) 	= sparse(nanmax(res1.surge,[],2));
+            if 1-all(isnan(nanmax(res1.surge,[],2)))
+                hazard.surge1(track_i,:) 	= sparse(nanmax(res1.surge,[],2));
+            end
         end
         
         % 2) CENAPRED FORMULA FOR THE MEX GULF OF MEXICO 
@@ -339,7 +354,9 @@ for track_i=1002%:length(tc_track)
             disp('Model: CENAPRED')
             % calculate wind field and then interpolates at centroids 
             res2 = climada_tc_hazard_surge_CENAPRED_field(tc_track_sim,centroids,equal_timestep, silent_mode, check_plot); 
-            hazard.surge2(track_i,:) 	= sparse(nanmax(res2.surge,[],2));
+            if 1-all(isnan(nanmax(res2.surge,[],2)))
+                hazard.surge2(track_i,:) 	= sparse(nanmax(res2.surge,[],2));
+            end
 %             res = climada_tc_hazard_surge_CENAPRED(tc_track_sim,centroids,equal_timestep, silent_mode, check_plot,unit_); 
         end
         
@@ -348,7 +365,9 @@ for track_i=1002%:length(tc_track)
         if any(surge_models==3) 
             disp('Model: Dean and Dalrymple with an uniform slope')
             res3 = climada_tc_hazard_surge_DD92_mslope(tc_track_sim,centroids, silent_mode,0); 
-            hazard.surge3(track_i,:) 	= sparse(nanmax(res3.surge,[],2));
+            if 1-all(isnan(nanmax(res3.surge,[],2)))
+                hazard.surge3(track_i,:) 	= sparse(nanmax(res3.surge,[],2));
+            end
         end
         
         % 4) Dean and Dalrymple 1992, eq long wave shoaling in profile 
@@ -370,9 +389,6 @@ for track_i=1002%:length(tc_track)
 % % %             res5 = climada_tc_hazard_surge_DD92(tc_track_sim,centroids,equal_timestep, silent_mode, check_plot,unit_); 
 % % %         end
     end
-    
-    hazard_arr_density    = 0.03; % 3% sparse hazard array density (estimated)
-    
     % --------------------------------------------------------------------
         % call for the surge footprint of the track
 
@@ -411,11 +427,13 @@ for track_i=1002%:length(tc_track)
         tracks_remaining  = length(tc_track)-track_i;
         t_projected_track = t_elapsed_track*tracks_remaining;
         msgstr            = sprintf('est. %i seconds left (%i tracks)',ceil(t_projected_track),tracks_remaining);
-        waitbar(track_i/length(tc_track),wbh,msgstr); % update waitbar
+        if climada_global.waitbar, 
+            waitbar(track_i/length(tc_track),wbh,msgstr); % update waitbar
+        end
     end
 
 end %track_i
-close(wbh); % dispose waitbar
+if climada_global.waitbar, close(wbh); end % dispose waitbar
 
 t_elapsed = etime(clock,t0);
 msgstr    = sprintf('generating %i SURGEfields took %f sec (%f sec/event)',length(tc_track),t_elapsed,t_elapsed/length(tc_track));
@@ -436,7 +454,7 @@ if isempty(hazard_set_file) % local GUI
 end
 
 hazard.frequency          = ones(1,hazard.event_count)*event_frequency; % not transposed, just regular
-hazard.matrix_density     = nnz(hazard.arr)/numel(hazard.arr);
+hazard.matrix_density     = nnz(hazard.surgePr)/numel(hazard.surgePr);
 hazard.surgefield_comment = msgstr;
 hazard.filename           = hazard_set_file;
 hazard.reference_year     = hazard_reference_year;

@@ -87,7 +87,7 @@ R=(0.4785.*P0-413.01); % ciclostrophic radious maximum winds
 units_PR=tc_track.CentralPressureUnit; 
 units_wind=tc_track.MaxSustainedWindUnit; 
 
-if units_wind=='kn', WW=WW*1.825; units_wind='km/h';end%% calibration of R and coriolis 
+if strcmp(units_wind,'kn'), WW=WW*1.825; units_wind='km/h';end%% calibration of R and coriolis 
 
 R=0.9*R; % calibration factor 
 

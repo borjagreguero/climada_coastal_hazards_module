@@ -1,4 +1,4 @@
-function res  = climada_tc_hazard_surge_CENAPRED(tc_track, centroids, ...
+function res  = climada_tc_hazard_surge_CENAPRED_field(tc_track, centroids, ...
     equal_timestep, silent_mode, check_plot)
 % generate hazard surge set from 1 tc_track 
 % NAME:
@@ -132,6 +132,10 @@ if check_plot
     end
 end
 
+%% 
+default_min_TimeStep = 1; % make all storms with same time step - avoids problems 
+tc_track = climada_tc_equal_timestep_coastal(tc_track,default_min_TimeStep); 
+
 %% INIT 
 track_nodes_count = length(tc_track.lat);
 centroid_count    = length(centroids.lat);
@@ -174,8 +178,8 @@ res.surge = repmat(res.lon(:).*nan,1,track_nodes_count-1);
 spatial_lag=1; % jump some track nodes   
 deg=180/pi;
 
-r = 0.2; circle = 0:0.1:2*pi+0.1; [x,y] = pol2cart(circle,r);
-r2 = 0.02; circle2 = 0:0.1:2*pi+0.1; [x2,y2] = pol2cart(circle2,r2);
+r  = 0.50;   circle = 0:0.1:2*pi+0.1; [x,y] = pol2cart(circle,r);
+r2 = 0.02;   circle2 = 0:0.1:2*pi+0.1; [x2,y2] = pol2cart(circle2,r2);
 
 try 
     coast = load([climada_global.coastline_file]); 
@@ -184,61 +188,90 @@ catch
 end 
 
 % find landing angle 
-ind = find(tc_track.onLand==1); 
-if isempty(ind), alfa_coast = nan; 
+% order position of storm in chronological order 
+
+ind = find(tc_track.onLand==1);
+ind = min(ind); % get the first point of arrival. Tracks advance chronologically 
+% time_positions= tc_track.dd + tc_track.hh./24; 
+
+if isempty(ind) || ind==1 % if no landing or storms starts inland
+    alfa_coast = nan; relativeAng = 0; 
 else 
     if check_code
         figure, plot(tc_track.lon,tc_track.lat,'.-') 
-        hold on, plot(tc_track.lon(ind),tc_track.lat(ind),'.r')
+        hold on, plot(tc_track.lon(ind),tc_track.lat(ind),'.r') % plot track 
     end
     
     % azimuth track 
-    landing = azimuth(tc_track.lat(ind-1),tc_track.lon(ind-1),...
-        tc_track.lat(ind),tc_track.lon(ind)); 
-    
+    landing = azimuth(tc_track.lat(ind),tc_track.lon(ind),...
+        tc_track.lat(ind-1),tc_track.lon(ind-1)); % angle of landing
+
     % angle of coastline at that point 
     xc = x + tc_track.lon(ind); % circle around point 
     yc = y + tc_track.lat(ind); 
     
-    in = inpolygon (coast.shapes.X,coast.shapes.Y,xc,yc); 
+    in = inpolygon (coast.shapes.X,coast.shapes.Y,xc,yc); % find points inland 
     coastalseg = [coast.shapes.X(in) ; coast.shapes.Y(in)]; 
-    if check_code, hold on, plot(coastalseg(1,:),coastalseg(2,:),'k'), end 
+    if check_code, hold on, plot(xc,yc,'.-k'), plot(coastalseg(1,:),coastalseg(2,:),'k'), end % plot coastline
     
 	[xi, yi] = polyxpoly(tc_track.lon(ind-1:ind), tc_track.lat(ind-1:ind),...
-        coastalseg(1,:),coastalseg(2,:));
-    if check_code, plot(xi,yi,'og'), end 
-    
-	xc = xi + x2; % circle around point 
-	yc = yi + y2;
-    
-    [xi, yi] = polyxpoly(xc, yc, coastalseg(1,:),coastalseg(2,:));
-    if check_code, plot(xi,yi,'or'), end 
-    
-    D = pdist2(xi,xi,'euclidean'); % matrix distance in case there is more than 2 intersections
-    [m ind] = max(D(:)); 
-    [rowsOfMaxes colsOfMaxes] = find(D == m);
-    angcoast = azimuth(yi(rowsOfMaxes(1)),xi(rowsOfMaxes(1)),yi(rowsOfMaxes(2)),xi(rowsOfMaxes(2))); 
+        coastalseg(1,:),coastalseg(2,:)); % finds landing point! 
+    % first point inland is actually 2nd point according to the coastline
+    % file. Source of error is the coastline ref. 
+    % solution: find 2nd node in water: ind-2 
+    if isempty(xi) % try with 2 nodes before if does not find intersection 
+        try 
+            [xi, yi] = polyxpoly(tc_track.lon(ind-2:ind), tc_track.lat(ind-2:ind),...
+                coastalseg(1,:),coastalseg(2,:));
+        end
+    end
+    if isempty(xi) % try with 2 nodes before if does not find intersection 
+        try 
+            [xi, yi] = polyxpoly(tc_track.lon(ind-1:ind+1), tc_track.lat(ind-1:ind+1),...
+                coastalseg(1,:),coastalseg(2,:));
+        end
+    end
+    if isempty(xi), 
+        alfa_coast = nan; 
+        relativeAng = 0; 
+    else 
+        
+        if check_code, plot(xi,yi,'og'), end % plot landing point 
 
-    relativeAng = landing - angcoast; 
+        xc = xi(end) + x2; % circle around point 
+        yc = yi(end) + y2;
+
+        [xi, yi] = polyxpoly(xc, yc, coastalseg(1,:),coastalseg(2,:));
+        if check_code, plot(xi,yi,'or'), end % plot coastal segment to calculate storm crossing 
+
+        D = pdist2(xi,xi,'euclidean'); % matrix distance in case there is more than 2 intersections
+        [m ind] = max(D(:)); 
+        [rowsOfMaxes colsOfMaxes] = find(D == m);
+        angcoast = azimuth(yi(rowsOfMaxes(1)),xi(rowsOfMaxes(1)),yi(rowsOfMaxes(2)),xi(rowsOfMaxes(2))); 
+
+        relativeAng = landing(1) - angcoast; 
+    end
 end
 
 % run solution for surges 
+check_code = 1; 
+
 for track_node_i = 2:spatial_lag:track_nodes_count % loop over track nodes (timesteps)
 
     % HURRICANE wind field  
     wind  = climada_tc_windfield_HURAC(tc_track,track_node_i, 3); 
-    
+    if all(isnan(wind.W(:))==1), continue, end 
+
     WW=tc_track.MaxSustainedWind(track_node_i); 
     P0=tc_track.CentralPressure(track_node_i);
     
     wc = interp2(wind.xx_lon,wind.yy_lat,wind.W,centroids.lon, centroids.lat);
+    ac = interp2(wind.xx_lon,wind.yy_lat,wind.alfa_wind,centroids.lon, centroids.lat);
     
-    %% SURGE MODEL 
+    %% SURGE MODEL CENAPRED 
     
     % check if centroids include angle of landing respect to coast 
     % this should be done in an upper level, in preprocessing. 
-    
-% -------- TO DO ---------
     
     % see documentation for formulas 
     R = 0.0007.* exp(0.01156.*P0); 
@@ -277,17 +310,96 @@ for track_node_i = 2:spatial_lag:track_nodes_count % loop over track nodes (time
 %     wc = wc -115; wc(wc<0)=0; 
     
 %     ratio = wc.^2./(nanmax(wc)).^2; % SS depends on the squere of V 
-    ratio = wc.^2./(nanmax(wind.W(:))).^2; % SS depends on the squere of V 
-
+%     ratio = wc.^2./(nanmax(wind.W(:))).^2; % SS depends on the squere of V 
+%     ratio = interp1([(nanmax(wind.W(:))).^2, (0.7.*nanmax(wind.W(:))).^2], ... 
+%                     [1 0],...
+%                     wc.^2)
+    ratio = interp1([(nanmax(wind.W(:))).^2, (60).^2], ... 
+                    [1 0],...
+                    wc.^2); 
     SSc  = SS.*ratio; 
     res.surge(:,track_node_i) = [SSc(:)]; 
+    
     if check_code && tc_track.onLand(track_node_i)==0
-        figure, contour(wind.xx_lon,wind.yy_lat,wind.W), 
+%         figure, 
+%         hold on 
+%         scatter(res.lon, res.lat, 10,ratio,'filled')
+%         colorbar 
+        
+        figure, %contour(wind.xx_lon,wind.yy_lat,wind.W), 
         hold on 
-        freezeColors
+%         freezeColors
         scatter(res.lon, res.lat, 10,res.surge(:,track_node_i),'filled')
         colorbar 
-        caxis([0 5]) 
+        contour(wind.xx_lon,wind.yy_lat,wind.W),
+%         caxis([0 5]) 
     end
     
+    %% SURGE MODEL CENAPRED modified with wind field gradient - BGR 
+% % %     Y = tc_track.lat(track_node_i) - tc_track.lat(track_node_i-1); 
+% % %     X = tc_track.lon(track_node_i) - tc_track.lon(track_node_i-1); 
+% % %     alfa_track = atan2(Y,X).*deg; 
+% % %     
+% % %     figure, 
+% % %     hold on 
+% % %     plot(centroids.lon,centroids.lat,'.') 
+% % %     quiver(centroids.lon(:),centroids.lat(:), cosd(centroids.angle_coast(:)), sind(centroids.angle_coast(:)));
+% % %     quiver(centroids.lon(:),centroids.lat(:), cosd(ac(:)), sind(ac(:)),'-k');
+% % %     axis equal 
+% % %     
+% % %     centroids.angle_coast(centroids.angle_coast<0)=centroids.angle_coast(centroids.angle_coast<0)+360; 
+% % %     
+% % %     delta_alfa_coast = centroids.angle_coast(:)-ac(:); 
+% % %     F2 = abs(sind(delta_alfa_coast)); 
+% % %     F  = 0.6.*(1+sind(abs(delta_alfa_coast)));
+% % % 
+% % %     figure,     
+% % %     hold on, scatter(centroids.lon(:),centroids.lat(:),20,delta_alfa_coast,'filled'), 
+% % %     colormap(jet) 
+% % %     quiver(wind.xx_lon, wind.yy_lat, wind.W.*cosd(wind.alfa_wind),wind.W.*sind(wind.alfa_wind)), 
+% % %     plot(tc_track.lon(:), tc_track.lat(:)) 
+% % %     axis equal 
+% % %     
+% % %     figure,     
+% % %     hold on, scatter(centroids.lon(:),centroids.lat(:),20,F2,'filled'), 
+% % %     colormap(jet) 
+% % %     quiver(wind.xx_lon, wind.yy_lat, wind.W.*cosd(wind.alfa_wind),wind.W.*sind(wind.alfa_wind)), 
+% % %     plot(tc_track.lon(:), tc_track.lat(:)) 
+% % %     axis equal 
+% % %     
+% % %     figure,     
+% % %     hold on, scatter(centroids.lon(:),centroids.lat(:),20,F,'filled'), 
+% % %     colormap(jet) 
+% % %     quiver(wind.xx_lon, wind.yy_lat, wind.W.*cosd(wind.alfa_wind),wind.W.*sind(wind.alfa_wind)), 
+% % %     plot(tc_track.lon(:), tc_track.lat(:)) 
+% % %     axis equal 
+% % %     
+% % %     delta_alfa = wind.alfa_wind-alfa_track; 
+% % %     mask = delta_alfa; %.*0+1; 
+% % %     mask(abs(delta_alfa)>90)=nan; 
+% % %     F2 = cosd(mask); 
+% % %     
+% % %    
+% % %     figure,     
+% % %     hold on, pcolor(wind.xx_lon, wind.yy_lat,delta_alfa), colormap(jet) 
+% % %     quiver(wind.xx_lon, wind.yy_lat, wind.W.*cosd(wind.alfa_wind),wind.W.*sind(wind.alfa_wind)), 
+% % %     plot([tc_track.lon(track_node_i), tc_track.lon(track_node_i-1)],...
+% % %         [tc_track.lat(track_node_i),tc_track.lat(track_node_i-1)])
+% % %     
+% % %     figure, 
+% % %     pcolor(wind.xx_lon, wind.yy_lat, mask)
+% % %     pcolor(wind.xx_lon, wind.yy_lat, F2) % F2 gives the projection ontrack direction 
+% % %     
+% % %     
+% % %     relativeAng = ac -angcoast;
+% % %     
+% % %     F = 0.6.*(1+sind(abs(relativeAng)));
+% % %     SS2 = (0.03.*R + 0.000119.*wc.^2 -1.4421).*F;
+% % %     figure, 
+% % %     hold on 
+% % %     contour(wind.xx_lon,wind.yy_lat,wind.W), 
+% % %     scatter(res.lon, res.lat, 10,SS2,'filled')
+% % %     colorbar 
+% % %     caxis([0 5])     
 end
+

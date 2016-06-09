@@ -7,12 +7,19 @@ tc_track_clean.lon = tc_track_clean.lon(ind);
 tc_track_clean.lat = tc_track_clean.lat(ind); 
 tc_track_clean.MaxSustainedWind = tc_track_clean.MaxSustainedWind(ind); 
 tc_track_clean.CentralPressure = tc_track_clean.CentralPressure(ind); 
+
 tc_track_clean.yyyy = tc_track_clean.yyyy(ind); 
 tc_track_clean.mm = tc_track_clean.mm(ind); 
 tc_track_clean.dd = tc_track_clean.dd(ind); 
 tc_track_clean.hh = tc_track_clean.hh(ind); 
+
 tc_track_clean.datenum = tc_track_clean.datenum(ind); 
 tc_track_clean.nodetime_mat = tc_track_clean.nodetime_mat(ind); 
 tc_track_clean.onLand = tc_track_clean.onLand(ind); 
 
+if isfield(tc_track_clean, 'MaxSustainedWind_ori') & 1-isempty(tc_track_clean.MaxSustainedWind_ori) 
+    % original tracks have empty field 
+    tc_track_clean.MaxSustainedWind_ori = tc_track_clean.MaxSustainedWind_ori(ind); 
+end
+    
 return 
