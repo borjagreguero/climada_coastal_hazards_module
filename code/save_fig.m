@@ -4,5 +4,5 @@ function save_fig(handle,file,res, varargin)
     end
     set(handle,'PaperPositionMode','auto')
     print(handle,'-dpng',[file],['-r',num2str(res)]); 
-    close(handle) 
+%     close(handle) 
 end

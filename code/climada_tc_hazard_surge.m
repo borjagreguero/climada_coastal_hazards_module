@@ -186,8 +186,12 @@ hazard.orig_years       = orig_years;
 hazard.event_count      = length(tc_track);
 hazard.event_ID         = 1:hazard.event_count;
 hazard.date             = datestr(now);
-hazard.orig_event_count = 0; % init
-hazard.orig_event_flag  = zeros(1,hazard.event_count);
+hazard.orig_event_count     = 0; % init
+hazard.coastal_event_count  = 0; % init
+
+hazard.orig_event_flag     = zeros(1,hazard.event_count);
+hazard.coastal_event_flag  = zeros(1,hazard.event_count);
+
 
 % allocate the hazard array (sparse, to manage memory)
 hazard.arr              = spalloc(hazard.event_count,...
@@ -254,9 +258,11 @@ unit_='m';
 % % %     [centroids] = fun_angcoast_centroids(centroids,coast); 
 % % % end
 % 
-for track_i=1332%1:length(tc_track)
+for track_i=1:length(tc_track)
 %     disp(track_i) 
     % 1391 = IKE 
+    hazard.orig_event_count         = hazard.orig_event_count + tc_track(track_i).orig_event_flag;
+    hazard.orig_event_flag(track_i) = tc_track(track_i).orig_event_flag;
     
         % PASS IF IT HAS NO CENTRAL PRESSURE 
     if all(isnan(tc_track(track_i).CentralPressure)==1), continue, end 
@@ -410,8 +416,8 @@ for track_i=1332%1:length(tc_track)
         end
         % --------------------------------------------------------------------
    
-    hazard.orig_event_count         = hazard.orig_event_count + tc_track(track_i).orig_event_flag;
-    hazard.orig_event_flag(track_i) = tc_track(track_i).orig_event_flag;
+    hazard.coastal_event_count         = hazard.coastal_event_count + tc_track(track_i).orig_event_flag;
+    hazard.coastal_event_flag(track_i) = tc_track(track_i).orig_event_flag;
     
     % if check_plot
     %     values=res.rainsum;values(values==0)=NaN; % suppress zero values

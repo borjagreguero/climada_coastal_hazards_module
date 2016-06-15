@@ -254,7 +254,7 @@ else
 end
 
 % run solution for surges 
-check_code = 1; 
+check_code = 0; 
 
 for track_node_i = 2:spatial_lag:track_nodes_count % loop over track nodes (timesteps)
 
@@ -314,9 +314,17 @@ for track_node_i = 2:spatial_lag:track_nodes_count % loop over track nodes (time
 %     ratio = interp1([(nanmax(wind.W(:))).^2, (0.7.*nanmax(wind.W(:))).^2], ... 
 %                     [1 0],...
 %                     wc.^2)
-    ratio = interp1([(nanmax(wind.W(:))).^2, (60).^2], ... 
-                    [1 0],...
+%     ratio = interp1([(nanmax(wind.W(:))).^2, 60.^2 (30).^2], ... 
+%                     [1 0.2 0],...
+%                     wc.^2); 
+    x = 20:10:100; x = x.^2; 
+    y = x.^2./(max(x)).^2; 
+%     figure,plot(sqrt(x),y) 
+    
+    ratio = interp1([x], ... 
+                    [y],...
                     wc.^2); 
+    
     SSc  = SS.*ratio; 
     res.surge(:,track_node_i) = [SSc(:)]; 
     
@@ -331,7 +339,7 @@ for track_node_i = 2:spatial_lag:track_nodes_count % loop over track nodes (time
 %         freezeColors
         scatter(res.lon, res.lat, 10,res.surge(:,track_node_i),'filled')
         colorbar 
-        contour(wind.xx_lon,wind.yy_lat,wind.W),
+% % %         contour(wind.xx_lon,wind.yy_lat,wind.W),
 %         caxis([0 5]) 
     end
     

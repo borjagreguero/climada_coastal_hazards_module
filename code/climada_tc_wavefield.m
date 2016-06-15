@@ -503,7 +503,7 @@ for track_node_i = 2:track_nodes_count%2:spatial_lag:track_nodes_count % loop ov
     %--------------------------------------------------------------------------
     % now interpolate at centroids 
     %--------------------------------------------------------------------------
-    for ii=1:numel(centroid_count) 
+    for ii=1:centroid_count 
         if models_waves(1) 
             res.Hwaves1(ii,track_node_i)= interp2(xx_lon,yy_lat,Hs1 ,centroids.lon (ii),centroids.lat(ii)).*factor_units; 
             res.Twaves1(ii,track_node_i)= interp2(xx_lon,yy_lat,Tp1 ,centroids.lon (ii),centroids.lat(ii)); 
