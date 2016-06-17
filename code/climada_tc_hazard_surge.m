@@ -259,13 +259,16 @@ unit_='m';
 % % % end
 % 
 for track_i=1:length(tc_track)
-%     disp(track_i) 
+    
     % 1391 = IKE 
+    % PASS IF IT HAS NO CENTRAL PRESSURE 
+    if all(isnan(tc_track(track_i).CentralPressure)==1), continue, end
+%     disp(track_i) 
     hazard.orig_event_count         = hazard.orig_event_count + tc_track(track_i).orig_event_flag;
     hazard.orig_event_flag(track_i) = tc_track(track_i).orig_event_flag;
     
-        % PASS IF IT HAS NO CENTRAL PRESSURE 
-    if all(isnan(tc_track(track_i).CentralPressure)==1), continue, end 
+    disp(['[tc_i ',num2str(track_i),'  "',tc_track(track_i).name, '"]']) 
+    
     % ---------------------------------------------------------------------
     % INTERNAL CONTROL PARAMETERS FOR TESTING CODE
 % % %     check_plot = 0; 
@@ -313,6 +316,8 @@ for track_i=1:length(tc_track)
             bathy, models_waves, equal_timestep, silent_mode, check_plot,unit_,dirout); 
     end
     
+    if all(isnan(resW.Wind(:))), continue, end % no wind field 
+
     % SAVE RESULTS only if any is not a NAN 
     if models_waves(1) 
         if 1-all(isnan(nanmax(resW.Hwaves1,[],2)))

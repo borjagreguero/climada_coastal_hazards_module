@@ -64,7 +64,7 @@ if ~exist('field'         , 'var'), field = 'intensity'; end
 if ~exist('check_printplot','var'), check_printplot= 0; end
 
 % eval field 
-eval(['intensity = hazard.',field,';'])
+eval(['all_intensity = hazard.',field,';'])
 hazard_mod = hazard; 
 
 % prompt for hazard if not given
@@ -126,30 +126,28 @@ if ~isfield(hazard,'R')
 elseif ~all(ismember(return_periods_show,hazard.R_fit))
     calc = 1;
 else
-    fprintf('Intensity data already calculated for %d\n', return_periods_show)
+    fprintf('all_intensity data already calculated for %d\n', return_periods_show)
     calc = 0;
 end
-
-intensity(isnan(full(intensity)))=0; 
 
 if calc
     fprintf('Calculate statistics...\n')
     
     % probabilistic
-    intensity_sort     = sort(intensity,'descend');
+    intensity_sort     = sort(all_intensity,'descend');
     % historical
-    intensity_ori_sort = sort(intensity(1:no_generated:end,:),'descend');
+    intensity_ori_sort = sort(all_intensity(1:no_generated:end,:),'descend');
     
-    eval(['hazard_mod.stats',field,'.R           = 1./cumsum(hazard.frequency)']);
-    eval(['hazard_mod.stats',field,'.R_ori       = 1./cumsum(hazard.frequency(1:no_generated:end)*no_generated)']);
+    eval(['hazard_mod.stats.',field,'.R           = 1./cumsum(hazard.frequency)']);
+    eval(['hazard_mod.stats.',field,'.R_ori       = 1./cumsum(hazard.frequency(1:no_generated:end)*no_generated)']);
     
-    %  decide for specific return periods, and calculate according intensity
+    %  decide for specific return periods, and calculate according all_intensity
     %  in original and probabilist events, add the following fields to hazard
     %   .intensity_fit_ori
     %   .R_fit_ori
     %   .intensity_fit
     %   .R_fit
-    n_centroids              = size(intensity,2);
+    n_centroids              = size(all_intensity,2);
     eval(['hazard_mod.stats.',field,'.intensity_fit_ori = spalloc(length(return_periods_calc),length(hazard.centroid_ID),ceil(length(return_periods_calc)*length(hazard.centroid_ID)*0.01));'])
     eval(['hazard_mod.stats.',field,'.intensity_fit     = spalloc(length(return_periods_calc),length(hazard.centroid_ID),ceil(length(return_periods_calc)*length(hazard.centroid_ID)*0.01));'])
     eval(['hazard_mod.stats.',field,'.R_fit             = return_periods_calc;']);
@@ -170,14 +168,18 @@ if calc
     for centroid_i = 1:n_centroids
         
         if no_generated>1 % only if historic differs from probabilistic
-            
+
+            % DELETE NANS TO NOT INCLUDE IN FREQ 
+            intensity = full(all_intensity(:,centroid_i)); intensity(isnan(full(intensity)))=0; 
+
             % historical data
             % ---------------
             
             [intensity_pos, ind_int]   = sort(intensity(1:no_generated:end,centroid_i),'descend');
             intensity_pos              = full(intensity_pos);
-            below_thresh_pos           = intensity_pos<intensity_threshold;
-            intensity_pos(intensity_pos<intensity_threshold) = [];
+            
+            below_thresh_pos           = intensity_pos<=intensity_threshold; % <= to delete 0 and do not consider in freq estimation 
+            intensity_pos(below_thresh_posd) = [];
             
             % sort frequency accordingly
             frequency2 = hazard.frequency(1:no_generated:end);
@@ -207,10 +209,13 @@ if calc
         % ------------------
         
         % intensity
-        [intensity_pos, ind_int]   = sort(intensity(:,centroid_i),'descend');
+        intensity = full(all_intensity(:,centroid_i)); % load intensity for the centroid
+        intensity(isnan(full(intensity)))=0;  % correct nans 
+        [intensity_pos, ind_int]   = sort(intensity,'descend'); % sort in descend order 
         intensity_pos              = full(intensity_pos);
-        below_thresh_pos           = intensity_pos<intensity_threshold;
-        intensity_pos(intensity_pos<intensity_threshold) = [];
+        
+        below_thresh_pos           = intensity_pos<=intensity_threshold;
+        intensity_pos(below_thresh_pos) = [];
         
         % sort frequency accordingly
         frequency2 = hazard.frequency;
@@ -233,7 +238,16 @@ if calc
             intensity_fit(neg)                 = 0; %nan;
             eval(['hazard_mod.stats.',field,'.intensity_fit(:,centroid_i) = intensity_fit;']);
         end % intensity_pos, probabilistic data
-        
+
+% ---------- checking code ----------
+% % %         x = -5:0.1:2; 
+% % %         pp = polyval(p,x)
+% % %         figure, 
+% % %         hold on 
+% % %         plot(log(freq(:)),  intensity_pos(:), '.k') 
+% % %         plot(x,pp,'r')
+%------------------------------------
+       
         if mod(centroid_i,mod_step)==0 && climada_global.waitbar
             mod_step = 100;
             t_elapsed = etime(clock,t0)/centroid_i;
@@ -289,9 +303,13 @@ if check_plot
 %             caxis_max = 100;
 %             xtick_    = [caxis_max/5:caxis_max/5:caxis_max];
             %xtick_    = [20 40 60 80 caxis_max];
-            caxis_max = full(prctile(intensity_fit(:),99));
-            caxis_min = full(min(intensity_fit(:)));
-            xtick_    = linspace(floor(caxis_max)/5,ceil(caxis_max),5);
+%             caxis_max = full(prctile(intensity_fit(:),99));
+%             caxis_min = full(min(intensity_fit(:)));
+            caxis_max = ceil(full(prctile(intensity_fit(:),99))*10)/10;
+            caxis_min = floor(full(min(intensity_fit(:)))*10)/10;
+            
+%             xtick_    = linspace(floor(caxis_max)/5,ceil(caxis_max),9);
+            xtick_    = linspace(caxis_min,caxis_max,6);
 %             xtick_    = [caxis_max/5:caxis_max/5:caxis_max]; 
             cbar_str  = 'Total Water levels (m)';
             
@@ -299,21 +317,24 @@ if check_plot
 %             caxis_max = 300; %caxis_max = 500;
 %             xtick_    = [caxis_max/5:caxis_max/5:caxis_max]; 
             %xtick_    = [10 50 100 200 caxis_max];
-            caxis_max = full(prctile(intensity_fit(:),99));
-            caxis_min = full(min(intensity_fit(:)));
+%             caxis_max = full(prctile(intensity_fit(:),99));
+%             caxis_min = full(min(intensity_fit(:)));
+            caxis_max = ceil(full(prctile(intensity_fit(:),99))*10)/10;
+            caxis_min = floor(full(min(intensity_fit(:)))*10)/10;
 %             xtick_    = [caxis_max/5:caxis_max/5:caxis_max]; 
-            xtick_    = linspace(floor(caxis_max)/5,ceil(caxis_max),5);
+            xtick_    = linspace(caxis_min,caxis_max,6);
 
             cbar_str  = 'Storm Surge (m)';
             
         case 'hs'
 %             caxis_max = 3;
-            caxis_max = full(prctile(intensity_fit(:),99));
-            caxis_min = full(min(intensity_fit(:)));
-            
+            caxis_max = ceil(full(prctile(intensity_fit(:),99))*10)/10;
+            caxis_min = floor(full(min(intensity_fit(:)))*10)/10;
+            xtick_    = linspace(caxis_min,caxis_max,6);
 %             xtick_    = [floor(caxis_max)/5:caxis_max/5:ceil(caxis_max)]; 
-            xtick_    = linspace(floor(caxis_max)/5,ceil(caxis_max),5);
-
+%             xtick_    = linspace(floor(caxis_max)/5,ceil(caxis_max),5);
+%             xtick_ = linspace(caxis_min,caxis_max,9); 
+%             xtick_ = caxis_min:0.2:caxis_max;
             %xtick_    = [1 2 4 caxis_max];
             cbar_str  = 'Sign. Wave Height (m)';
             
@@ -349,7 +370,7 @@ if check_plot
         he = 1.2/scale_tot;
     end
     
-    fig2 = climada_figuresize(he+0.1, wi);
+    fig2 = climada_figuresize(he+0.1, wi*1.5);
     subaxis(x_no, y_no, 1,'MarginTop',0.15, 'mb',0.05)
     
     % colorbar
@@ -359,7 +380,7 @@ if check_plot
     dist = .06;
     hc = colorbar('location','northoutside', 'position',[pos(1)-dist*5/2 pos(2)+pos(4)+dist pos(3)+dist*5 0.03]);
     set(get(hc,'xlabel'), 'String',cbar_str, 'fontsize',fontsize);
-    caxis([0 caxis_max])
+    caxis([caxis_min caxis_max])
     set(gca,'fontsize',fontsize)
     hold on
     
@@ -407,7 +428,7 @@ if check_plot
 %     end
     if check_printplot %(>=1)
 %         foldername = [filesep 'results' filesep 'hazard_stats_probabilistic_' strtok(hazard.comment) '_' int2str(hazard.reference_year) '.pdf'];
-        filename = [climada_global.results_hazards_dir filesep 'hazard_stats_', peril_ID,'_', strtok(hazard.comment),'_' int2str(hazard.reference_year) '.pdf'];
+        filename = [climada_global.results_hazards_dir filesep 'hazard_stats_', peril_ID,'_', strtok(hazard.comment),'_' int2str(hazard.reference_year)];
         save_fig(gcf,[filename],200)
 %         print(gcf,'-dpdf',[filename])
 %         close

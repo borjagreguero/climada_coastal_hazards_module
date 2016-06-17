@@ -131,8 +131,15 @@ end
 
 if 1-isfield(centroids,'mslope')
     warning('no mean slope given')
-    if 1-isfield(centroids,'profiles'), error('no "profiles" given in centroids'), end 
-    centroids.mslope = fun_calculate_mean_slope(centroids) % requires profiles in centroids
+    if isfield(centroids,'profiles'), 
+        centroids.mslope = fun_calculate_mean_slope(centroids) % requires profiles in centroids
+        USE_CENTROIDS_SLOPE = 0
+    else
+        warning('no "profiles" given in centroids'), 
+        centroids.mslope =centroids.lon.*0+0.02;
+        USE_CENTROIDS_SLOPE = 1; 
+    end
+    
 end
 
 %% INIT 
@@ -186,12 +193,17 @@ catch
     error('problem loading coastline file') 
 end 
 
-points_init_profile = [vertcat(centroids.transects(:).p1)]; 
-points_end_profile  = [vertcat(centroids.transects(:).p2)]; 
+if 1-isfield(centroids,'transects')
+    points_init_profile = [centroids.lon(:) centroids.lat(:)]; 
+    points_end_profile  = [centroids.lon(:) centroids.lat(:)];  
+else
+    points_init_profile = [vertcat(centroids.transects(:).p1)]; 
+    points_end_profile  = [vertcat(centroids.transects(:).p2)]; 
+end
 Ncentroids          = numel(centroids.lon); 
 
 %% init res.surge 
-CALCULATE_TIME_SERIES = 0 % activate to calculate all time intervals. Otherwise it will calculate only for the max winds 
+CALCULATE_TIME_SERIES = 0; % activate to calculate all time intervals. Otherwise it will calculate only for the max winds 
 
 % res.arr1 = repmat(res.lon(:).*nan,1,track_nodes_count-1); 
 % res.arr2 = repmat(res.lon(:).*nan,1,track_nodes_count-1); 
@@ -224,7 +236,7 @@ for track_node_i = 2:spatial_lag:track_nodes_count % loop over track nodes (time
     u10(:,track_node_i) = mean([wc1,wc2],2) ./3.6; % mean wind over profile  
 end
 %% calculate slope 
-USE_CENTROIDS_SLOPE = 0
+depth = 50; 
 if USE_CENTROIDS_SLOPE 
     m2 = abs(centroids.mslope); 
 else 

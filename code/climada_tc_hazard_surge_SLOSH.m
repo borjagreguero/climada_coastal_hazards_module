@@ -215,6 +215,8 @@ res.node_lon     = zeros(1,centroid_count);
 res.lat = centroids.lat;
 res.lon = centroids.lon;
 
+res.surge = zeros(1,centroid_count);
+        
 % add further fields (for climada use)
 if isfield(centroids,'centroid_ID'),res.ID          = centroids.centroid_ID; end
 if isfield(centroids,'elevation_m'),res.elevation_m = centroids.elevation_m; end
@@ -308,8 +310,7 @@ for centroid_ii=1:centroid_count % now loop over all valid centroids
         arr_nonzero=find(res.gust); % to avoid de-sparsify all elements
         res.surge(arr_nonzero)=0.1023*(max(res.gust(arr_nonzero)-26.8224,0))+1.8288; % m/s converted to m surge height
         % ------------------------------------------------------- 
-                
-    end % D<5*R
+    end% D<5*R
     
 end % centroid_ii
 
