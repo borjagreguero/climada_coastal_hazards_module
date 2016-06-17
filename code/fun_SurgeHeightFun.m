@@ -71,58 +71,55 @@ surgeheight=eta(end,1);
 
 %--------------------------------------------------------------------------
 if check_plot 
-%plotting
-close
-figure 
+    %plotting
+    close
+    figure 
+    if m==0
+        x1=[0;l+l/10;l+l/10;l;l-l/10;0];
+        y1=[-h0/10;-h0/10;h0-h0/10;h0-h0/10;0;0];
+        fill(x1,y1,1/255*[102,51,0])
 
-if m==0
-    x1=[0;l+l/10;l+l/10;l;l-l/10;0];
-    y1=[-h0/10;-h0/10;h0-h0/10;h0-h0/10;0;0];
-    fill(x1,y1,1/255*[102,51,0])
-    
-    x2=[0;l-l/10;l;l+l/10;l+l/10;0];
-    y2=[0;0;h0-h0/10;h0-h0/10;h0;h0];
-    hold on
-    fill(x2,y2,1/255*[153,204,255])
-    
-    x33=flipud(x);
-    x3=[x;x33];
-    y331(1:length(x(:,1)),1)=h0;
-    y332=flipud(eta)+h0;
-    y3=[y331;y332];
-    fill(x3,y3,1/255*[255,0,0])
-    
-    xlim([0 l+l/10])
-    
-    hleg1=legend('Sea Bed','Water','Storm Surge');
-    set(hleg1,'Location','SouthEast')    
-    
-else
-    
-    x1=[0;l+l/10;l+l/10;l;0];
-    y1=[-h0/10;-h0/10;h0-h0/10;h0-h0/10;0];
-    fill(x1,y1,1/255*[102,51,0])
-    
-    x2=[0;l;l+l/10;l+l/10;0];
-    y2=[0;h0-h0/10;h0-h0/10;h0;h0];
-    hold on
-    fill(x2,y2,1/255*[153,204,255])
-    
-    x33=flipud(x);
-    x3=[x;x33];
-    y331(1:length(x(:,1)),1)=h0;
-    y332=flipud(eta)+h0;
-    y3=[y331;y332];
-    fill(x3,y3,1/255*[255,0,0])
-    
-    xlim([0 l+l/10])
-    %ylim([-h0/10 ;:])
-    
-    hleg1=legend('Sea Bed','Water','Storm Surge');
-    set(hleg1,'Location','SouthEast')    
+        x2=[0;l-l/10;l;l+l/10;l+l/10;0];
+        y2=[0;0;h0-h0/10;h0-h0/10;h0;h0];
+        hold on
+        fill(x2,y2,1/255*[153,204,255])
 
-end
+        x33=flipud(x);
+        x3=[x;x33];
+        y331(1:length(x(:,1)),1)=h0;
+        y332=flipud(eta)+h0;
+        y3=[y331;y332];
+        fill(x3,y3,1/255*[255,0,0])
 
+        xlim([0 l+l/10])
+
+        hleg1=legend('Sea Bed','Water','Storm Surge');
+        set(hleg1,'Location','SouthEast')    
+
+    else
+
+        x1=[0;l+l/10;l+l/10;l;0];
+        y1=[-h0/10;-h0/10;h0-h0/10;h0-h0/10;0];
+        fill(x1,y1,1/255*[102,51,0])
+
+        x2=[0;l;l+l/10;l+l/10;0];
+        y2=[0;h0-h0/10;h0-h0/10;h0;h0];
+        hold on
+        fill(x2,y2,1/255*[153,204,255])
+
+        x33=flipud(x);
+        x3=[x;x33];
+        y331(1:length(x(:,1)),1)=h0;
+        y332=flipud(eta)+h0;
+        y3=[y331;y332];
+        fill(x3,y3,1/255*[255,0,0])
+
+        xlim([0 l+l/10])
+        %ylim([-h0/10 ;:])
+
+        hleg1=legend('Sea Bed','Water','Storm Surge');
+        set(hleg1,'Location','SouthEast')    
+    end
 end
 %--------------------------------------------------------------------------
 % no need to clear workspace because is a function now 

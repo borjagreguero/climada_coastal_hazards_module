@@ -81,7 +81,7 @@ function hazard  = climada_tc_hazard_surge(tc_track,hazard_set_file,centroids,..
 % init global variables
 global climada_global
 if ~climada_init_vars,return;end
-dirout = [climada_global.root_coastal_dir,filesep,'test']; 
+dirout = [climada_global.results_hazards_dir,filesep,'outputs_single_storms']; 
 if exist(dirout    ,'dir')==0, mkdir(dirout); end 
 
 hazard = []; % init
@@ -90,7 +90,7 @@ hazard = []; % init
 if ~exist('tc_track'       ,'var'), tc_track        = []; end
 if ~exist('hazard_set_file','var'), hazard_set_file = []; end
 if ~exist('centroids'      ,'var'), centroids       = []; end
-if ~exist('check_plot'     ,'var'), check_plot      = 1;  end
+if ~exist('check_plot'     ,'var'), check_plot      = 0;  end
 if ~exist('silent_mode'    ,'var'), silent_mode     = 0;  end
 % if ~exist('type_hazards'   ,'var'), type_hazards    = [1 1];   end % activates waves, surges
 
@@ -192,7 +192,6 @@ hazard.coastal_event_count  = 0; % init
 hazard.orig_event_flag     = zeros(1,hazard.event_count);
 hazard.coastal_event_flag  = zeros(1,hazard.event_count);
 
-
 % allocate the hazard array (sparse, to manage memory)
 hazard.arr              = spalloc(hazard.event_count,...
                                   length(hazard.lon),...
@@ -267,15 +266,11 @@ for track_i=1:length(tc_track)
     hazard.orig_event_count         = hazard.orig_event_count + tc_track(track_i).orig_event_flag;
     hazard.orig_event_flag(track_i) = tc_track(track_i).orig_event_flag;
     
-    disp(['[tc_i ',num2str(track_i),'  "',tc_track(track_i).name, '"]']) 
-    
     % ---------------------------------------------------------------------
     % INTERNAL CONTROL PARAMETERS FOR TESTING CODE
 % % %     check_plot = 0; 
 % % %     silent_mode = 0; 
     % ---------------------------------------------------------------------
-    
-    res=[]; 
     
     % only calculate tracks within a region 
     inregion = inpolygon(tc_track(track_i).lon,tc_track(track_i).lat,...
@@ -283,7 +278,10 @@ for track_i=1:length(tc_track)
         [boundingbox(3)  boundingbox(3) boundingbox(4) boundingbox(4) boundingbox(3)]); 
     ind = find (inregion ~= 0); 
     if isempty(ind), continue, end % next storm 
-    
+
+    disp(['[tc_i ',num2str(track_i),'  "',tc_track(track_i).name, '"]']) 
+    res=[]; 
+        
     % find if storm center is close enought to centroids
     for jj = 1:numel(ind) 
         dist = GeoDistance(centroids.lon,centroids.lat,tc_track(track_i).lon(ind(jj)),tc_track(track_i).lat(ind(jj))); 
@@ -381,6 +379,22 @@ for track_i=1:length(tc_track)
             end
         end
         
+        if check_plot
+            coast = load([climada_global.coastline_file]); 
+            coast.lon = [coast.shapes(:).X]; 
+            coast.lat = [coast.shapes(:).Y]; 
+
+            figure('Visible','on'), hold on
+            LL = 1; 
+            scatter(hazard.lon, hazard.lat,30,hazard.surge3,'filled')
+            colorbar 
+            plot(coast.lon, coast.lat,'-k')
+            axis([min(hazard.lon)-LL max(hazard.lon)+LL min(hazard.lat(:))-LL max(hazard.lat)+LL])
+            set(gca,'fontsize',8)
+            xlabel('Lon'), ylabel('Lat'), grid on, box on 
+            title(['SURGE - D&D92 - ',deblank(tc_track_sim.name)])
+        end
+
         % 4) Dean and Dalrymple 1992, eq long wave shoaling in profile 
         % simplification with mean slope 
         % requires transects with slope!!! 

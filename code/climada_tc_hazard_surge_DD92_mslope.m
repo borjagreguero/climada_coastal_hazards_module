@@ -93,7 +93,7 @@ if ~exist('check_plot'     ,'var'), check_plot   = 0;  end
 % if ~exist('unit_'         ,'var'),  unit_          = 'mm'; end
 if ~exist('silent_mode'    ,'var'),  silent_mode = 1;  end
 
-equal_timestep=1;  
+% equal_timestep=1;  
        
 % PARAMETERS
 % since we store the hazard as sparse array, we need an a-priory estimation
@@ -129,14 +129,16 @@ if 1-isfield(centroids,'transects'),
 %     centroids =  fun_calculate_transects(centroids) 
 end
 
+depth = 100;  % default parameter 
+
 if 1-isfield(centroids,'mslope')
     warning('no mean slope given')
     if isfield(centroids,'profiles'), 
-        centroids.mslope = fun_calculate_mean_slope(centroids) % requires profiles in centroids
+        centroids.mslope = fun_calculate_mean_slope(centroids); % requires profiles in centroids
         USE_CENTROIDS_SLOPE = 0
     else
         warning('no "profiles" given in centroids'), 
-        centroids.mslope =centroids.lon.*0+0.02;
+        centroids.mslope =centroids.lon.*0+0.08; % 5 perc 
         USE_CENTROIDS_SLOPE = 1; 
     end
     
@@ -236,7 +238,6 @@ for track_node_i = 2:spatial_lag:track_nodes_count % loop over track nodes (time
     u10(:,track_node_i) = mean([wc1,wc2],2) ./3.6; % mean wind over profile  
 end
 %% calculate slope 
-depth = 50; 
 if USE_CENTROIDS_SLOPE 
     m2 = abs(centroids.mslope); 
 else 
@@ -265,12 +266,15 @@ if CALCULATE_TIME_SERIES
 %             dd = GeoDistance(points_init_profile(jj,1), points_init_profile(jj,2),...
 %                              points_end_profile (jj,1), points_end_profile (jj,2));
 %             m2 = depth./dd./1000; % "representative" mean slope 
-            if jj ==1, check_plot = 1, else, check_plot = 0; end 
+%             if jj ==1, check_plot = 1, else, check_plot = 0; end 
             [res.surge(jj,track_node_i)]=fun_SurgeHeightFun(depth,u10(jj,track_node_i),m2(jj),check_plot); 
         end
     end
 else  % just for the maximum wind 
-    u10 = nanmax(u10,[],2); 
+    
+% % %     u10 = nanmax(u10,[],2); 
+    u10 = prctile(u10,99,2); 
+
     for jj = 1:Ncentroids
         if u10(jj,1).*3.6 < 100 | isnan(u10(jj,1)),  continue, end % do not calculate, save time 
         [res.surge(jj,1)]=fun_SurgeHeightFun(depth,u10(jj,1),m2(jj),check_plot); 
