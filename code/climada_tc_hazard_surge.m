@@ -257,13 +257,13 @@ unit_='m';
 % % %     [centroids] = fun_angcoast_centroids(centroids,coast); 
 % % % end
 % 
-for track_i=1:length(tc_track)
+for track_i=1:length(tc_track) %[981 1002 1358 ]
     
     % 1391 = IKE 
+    hazard.orig_event_count         = hazard.orig_event_count+tc_track(track_i).orig_event_flag;
     % PASS IF IT HAS NO CENTRAL PRESSURE 
     if all(isnan(tc_track(track_i).CentralPressure)==1), continue, end
 %     disp(track_i) 
-    hazard.orig_event_count         = hazard.orig_event_count + tc_track(track_i).orig_event_flag;
     hazard.orig_event_flag(track_i) = tc_track(track_i).orig_event_flag;
     
     % ---------------------------------------------------------------------
@@ -373,7 +373,7 @@ for track_i=1:length(tc_track)
         % requires transects with slope!!! 
         if any(surge_models==3) 
             disp('Model: Dean and Dalrymple with an uniform slope')
-            res3 = climada_tc_hazard_surge_DD92_mslope(tc_track_sim,centroids, silent_mode,0); 
+            res3 = climada_tc_hazard_surge_DD92_mslope(tc_track_sim,centroids, silent_mode,check_plot); 
             if 1-all(isnan(nanmax(res3.surge,[],2)))
                 hazard.surge3(track_i,:) 	= sparse(nanmax(res3.surge,[],2));
             end
@@ -386,13 +386,23 @@ for track_i=1:length(tc_track)
 
             figure('Visible','on'), hold on
             LL = 1; 
-            scatter(hazard.lon, hazard.lat,30,hazard.surge3,'filled')
+            scatter(hazard.lon(:), hazard.lat(:),30,hazard.surge3(track_i,:),'filled')
             colorbar 
             plot(coast.lon, coast.lat,'-k')
             axis([min(hazard.lon)-LL max(hazard.lon)+LL min(hazard.lat(:))-LL max(hazard.lat)+LL])
             set(gca,'fontsize',8)
             xlabel('Lon'), ylabel('Lat'), grid on, box on 
             title(['SURGE - D&D92 - ',deblank(tc_track_sim.name)])
+            
+            figure('Visible','on'), hold on
+            LL = 1; 
+            scatter(hazard.lon(:), hazard.lat(:),30,hazard.surge2(track_i,:),'filled')
+            colorbar 
+            plot(coast.lon, coast.lat,'-k')
+            axis([min(hazard.lon)-LL max(hazard.lon)+LL min(hazard.lat(:))-LL max(hazard.lat)+LL])
+            set(gca,'fontsize',8)
+            xlabel('Lon'), ylabel('Lat'), grid on, box on 
+            title(['SURGE - CENAPRED- ',deblank(tc_track_sim.name)])
         end
 
         % 4) Dean and Dalrymple 1992, eq long wave shoaling in profile 

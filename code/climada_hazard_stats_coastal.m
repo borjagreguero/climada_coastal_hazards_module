@@ -175,11 +175,11 @@ if calc
             % historical data
             % ---------------
             
-            [intensity_pos, ind_int]   = sort(intensity(1:no_generated:end,centroid_i),'descend');
+            [intensity_pos, ind_int]   = sort(intensity(1:no_generated:end),'descend');
             intensity_pos              = full(intensity_pos);
             
             below_thresh_pos           = intensity_pos<=intensity_threshold; % <= to delete 0 and do not consider in freq estimation 
-            intensity_pos(below_thresh_posd) = [];
+            intensity_pos(below_thresh_pos) = [];
             
             % sort frequency accordingly
             frequency2 = hazard.frequency(1:no_generated:end);
@@ -239,14 +239,18 @@ if calc
             eval(['hazard_mod.stats.',field,'.intensity_fit(:,centroid_i) = intensity_fit;']);
         end % intensity_pos, probabilistic data
 
-% ---------- checking code ----------
-% % %         x = -5:0.1:2; 
-% % %         pp = polyval(p,x)
-% % %         figure, 
-% % %         hold on 
-% % %         plot(log(freq(:)),  intensity_pos(:), '.k') 
-% % %         plot(x,pp,'r')
-%------------------------------------
+        % ---------- checking code ----------
+        check_code = 0; 
+        if check_code
+            x = -5:0.1:2; 
+            pp = polyval(p,x)
+            figure, 
+            hold on 
+            plot(log(freq(:)),  intensity_pos(:), '.k') 
+            plot(x,pp,'r')
+            
+        end
+        %------------------------------------
        
         if mod(centroid_i,mod_step)==0 && climada_global.waitbar
             mod_step = 100;
@@ -417,7 +421,11 @@ if check_plot
         if ~exist('cmap','var'), cmap = '';end
         if ~isempty(cmap), colormap(cmap);end
         set(gca,'fontsize',fontsize)
-        set(hc,'XTick',str2num(sprintf('%2.1f ',xtick_))); 
+        try 
+            set(hc,'XTick',str2num(sprintf('%2.1f ',xtick_))); 
+        catch 
+            set(hc,'XTick',xtick_); 
+        end
     end %return_i
     if climada_global.waitbar,close(h);end % dispose waitbar
     

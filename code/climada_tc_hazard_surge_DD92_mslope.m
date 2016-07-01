@@ -138,7 +138,7 @@ if 1-isfield(centroids,'mslope')
         USE_CENTROIDS_SLOPE = 0
     else
         warning('no "profiles" given in centroids'), 
-        centroids.mslope =centroids.lon.*0+0.08; % 5 perc 
+        centroids.mslope =centroids.lon.*0+0.002; % 5 perc 
         USE_CENTROIDS_SLOPE = 1; 
     end
     
@@ -272,14 +272,16 @@ if CALCULATE_TIME_SERIES
     end
 else  % just for the maximum wind 
     
-% % %     u10 = nanmax(u10,[],2); 
-    u10 = prctile(u10,99,2); 
+%     u10 = nanmax(u10,[],2); 
+    u10 = prctile(u10,95,2); 
 
     for jj = 1:Ncentroids
-        if u10(jj,1).*3.6 < 100 | isnan(u10(jj,1)),  continue, end % do not calculate, save time 
+        if u10(jj,1).*3.6 < 100 | isnan(u10(jj,1)), continue, end % do not calculate, save time 
         [res.surge(jj,1)]=fun_SurgeHeightFun(depth,u10(jj,1),m2(jj),check_plot); 
     end
 end
+
+% figure, scatter(centroids.lon(:), centroids.lat(:), 20,res.surge(:,1),'filled'), colorbar
 
 % if check_plot
 % figure, plot(nanmax(res.surge,[],2),'k'), hold on, plot(res.arr2,'r');    

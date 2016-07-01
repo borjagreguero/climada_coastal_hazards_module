@@ -60,4 +60,7 @@ fprintf('initializing climada_coastal... ');
 %initialises the global variables
 climada_init_vars_coastal;
 
+% fprintf('Activating EDS at centroids... ');
+% climada_global.EDS_at_centroid = 1; 
+
 fprintf('done\n');
