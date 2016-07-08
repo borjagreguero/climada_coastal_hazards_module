@@ -119,6 +119,7 @@ else
 %         COLS_IDS =[1,2,3]; 
 %         COLS_DATA_BY_ELEV = [4:23]; 
         Nrows = numel(NUMERIC(:,1)); 
+%         disp(['#rows = ',num2str(Nrows)])
         header_pos = 1; 
         
         % assign ids with fields 

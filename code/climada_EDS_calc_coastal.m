@@ -152,15 +152,16 @@ EDS.event_ID          = hazard.event_ID;
 EDS.damage            = zeros(1,Nstorms);
 EDS.damage_bytp       = zeros(Ntypes,Nstorms);
 EDS.damage_by_elevation = zeros(Nelev,Nstorms);
-EDS.damage_at_centroid  = zeros(Ncentroids,Nstorms);
 
 EDS.ED                = zeros(1,1);
 EDS.ED_bytp_by_elevation = zeros(Ntypes,Nelev);
 
 n_assets                 = Ncentroids;
 if climada_global.EDS_at_centroid
+    EDS.damage_at_centroid  = zeros(Ncentroids,Nstorms);
     EDS.ED_at_centroid      = zeros(n_assets,1); % expected damage per centroid
     EDS.ED_at_centroid_bytp = zeros(n_assets,Ntypes); % expected damage per centroid
+    EDS.Value_at_centroid   = zeros(n_assets,Nelev);
 end
 
 EDS.Value             = 0;
@@ -193,7 +194,6 @@ for type = 1:Ntypes
     EDS.damage              = EDS.damage + EDSi.damage;
 	EDS.damage_by_elevation = EDS.damage_by_elevation + EDSi.damage_by_elevation; 
     EDS.damage_bytp(type,:) = EDSi.damage';
-    EDS.damage_at_centroid  = EDS.damage_at_centroid + full(EDSi.damage_at_centroid); 
     
     EDS.ED                = EDS.ED + EDSi.ED;
     EDS.ED_bytp_by_elevation(type,:) = EDSi.ED_by_elevation; 
@@ -206,7 +206,13 @@ for type = 1:Ntypes
     % NOTE: to validate, it gets the same result that outside the loop with 
     %   total damages - see at the end of script 
     
-    EDS.ED_at_centroid_bytp(:,type) = EDSi.ED_at_centroid; 
+    % save entity value to calculate damages relative to Value by elevation 
+%     EDS.assets.Value_at_centroid_bytp(type).Value= entity.assets.Value; 
+    if climada_global.EDS_at_centroid
+        EDS.damage_at_centroid          = EDS.damage_at_centroid + full(EDSi.damage_at_centroid); 
+        EDS.ED_at_centroid_bytp(:,type) = EDSi.ED_at_centroid;
+        EDS.Value_at_centroid           = EDS.Value_at_centroid + entity.assets.Value; 
+    end
 end
 EDS.damage_at_centroid = sparse(EDS.damage_at_centroid); 
 
@@ -221,6 +227,7 @@ EDS.hazard.comment  = char(hazard.comment);
 EDS.elevation_array = entity.elevation_array;
 
 EDS.assets.filename = annotation_name;
+EDS.assets.centroid_index = entity_orig.assets(1).centroid_index;
 EDS.assets.lat = entity_orig.assets(1).lat;
 EDS.assets.lon = entity_orig.assets(1).lon;
 EDS.assets.asset_types = entity_orig.asset_types;

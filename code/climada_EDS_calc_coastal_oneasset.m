@@ -265,6 +265,8 @@ for asset_ii=1:nn_assets
             interp_x_table = entity.damagefunctions.Intensity(asset_damfun_pos); % to pass damagefunctions to climada_sparse_interp
             interp_y_table = entity.damagefunctions.MDD(asset_damfun_pos); % to pass damagefunctions to climada_sparse_interp
             MDD            = spfun(@climada_sparse_interp, hwater); % apply to non-zero elements only
+            MDD(MDD<0)     = 0;  % correct extrapolation for very low values 
+            
             % OPTIMIZATION HINT: see climada_sparse_interp, would interp_x_table be uniformly spaced...
 
             % figure
@@ -275,7 +277,7 @@ for asset_ii=1:nn_assets
             % similarly, convert hazard intensity into PAA
             interp_y_table = entity.damagefunctions.PAA(asset_damfun_pos); % to pass damagefunctions to climada_sparse_interp
             PAA            = spfun(@climada_sparse_interp,hwater); % apply to non-zero elements only
-
+            PAA(PAA<0)     = 0; 
             % figure
             % plot(interp_x_table, interp_y_table,':k')
             % hold on
