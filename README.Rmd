@@ -1,31 +1,67 @@
 ---
 title: "README"
-author: "BGR"
-date: "May 16, 2016"
-output: html_document
+author: "Borja G. Reguero"
+email: "borjagreguero@gmail.com" 
+date: "Created: February, 2016"
+output:
+  html_document:
+    toc: true
+    toc_float: true
+    toc_depth: 2
 ---
+
 Climada - Coastal Hazards Module
 ====================================================================
 
-Author: Borja G. Reguero - borjagreguero@gmail.com 
+Author: Borja G. Reguero - borjagreguero@gmail.com - University of California, Santa Cruz 
 
-Date: February 22, 2016
+Date of last update: July, 8 
 
 Climada stands for climate adaptation and is a probabilistic natural catastrophe damage model. Information on the core package can be found at <https://github.com/davidnbresch/climada/wiki>. This module add specific features for coastal zones. 
 
+## Description
+This module adds specific functions to the climada suite that are particularly interesting for coastal areas and coastal risks. The functions and tools in this module work with the climada main core functions and applications (i.e. you need to have climada installed). 
 
-### Description
-This module add specific functions for coastal areas that adds to the capabilities of climada main core functions and applications. 
+Some functions have been modified from core climada original functions and adapted to more user specific needs and further customization. 
 
-### Core elements: 
+## Core elements {.tabset .tabset-fade .tabset-pills}
+
+### Hazard Simulation 
+
+** A. Hazard Simulation **
+
+There is a family of functions that help to assess different coastal hazards, namely: 
+
 - Storm simulation: simulate storm wind and pressure field, to compute surge and wave fields 
-- Sea Level Rise: calculates historical sea level rise and subsidence, as in Losada et al (2013), as well as end of centruy projections according to AR5 (see documentation)
-- Tides: calculates astronomical tide for any point in the globe 
-- Surges: storm surge at coastal points. It includes four differnt methods: 2 published relationships with wind speed and one approximation of the shoaling of long waves for uniform and not uniform slope. 
-- Hurricane wind waves: generates wave fields according to three different methods 
-- Global Waves (additional module and data): calculates main statistics of global wave climate at global points from Reguero et al (2012) and (2015)
+- Sea Level Rise: calculates (i) historical sea level rise and subsidence, as in Losada et al (2013), as well as (ii) end of the century projections using AR5 outputs (see documentation)
+- Tides: calculates astronomical tide for any location in the globe (based on TPXO database).  
+- Surges: simulates storm surge at coastal points. This module includes four different methods: two published relationships between surges and wind speeds; and one approximation of the shoaling of long waves for uniform and not uniform slopes (one assumes constant coastal shelf slope, another one uses a coastal transect with irregular bathymetry). 
+- Hurricane wind waves: generates wave fields (wave height and periods) for hurricanes using three different methods.  
+- Global Waves (additional module and data): calculates main statistics of global wave climate based on Reguero et al (2012) and (2015). 
 
-### How to use 
+### Coastal flood and expected damages calculation 
+
+** B. Coastal areas flood and expected damage calculation ** 
+
+Another set of functions helps to calculate damages from an entity dataset that includes value of assets by elevations. It uses a similar basis than core climada Expected Damage Calculation (see climada user manual) but includes elevation and multiple entity types. For example: distribution of commercial, industrial and residential assets, each with different damages curves, are calculated across elevations considering local water depth at each elevation. 
+
+This entity curves represent the socioeconomic exposure curves must be calculate upfront and form the input for the model. This is usually done in GIS or other tools (email authors for guidance if needed). 
+
+###  Auxiliary functions 
+
+** C. Auxiliary functions **
+
+Other functions help to plot and save figures, help with different operations and add capabilities that can be used outside climada. Some examples follow: 
+- save figures in different formats and resolutions 
+- calculate long term trends 
+- accumulated cyclone energy calculation 
+- self organizing maps toolbox and examples (requires installing aux_modules)
+- save matlab data from ascii format to raster (requires installing aux_modules)
+- other wave climate tools for multivariate climate analysis (requires installing aux_modules) 
+
+## How to use 
+
+#### A. Hazard Simulation
 
 ```{matlab}
 % get SLR projection by end of century 
@@ -44,15 +80,162 @@ tide=climada_getTemporalSerie_AT(y0,x0,datenum(2000,1,1),datenum(2016,1,1),'TPXO
 % get wave climate at a number of points 
 correct_by_coast = 1; % this takes into account only points seawards, important for not selecting points behind islands
 [output]=climada_get_GlobalWaveClimate(coastal_hazard_centroids.Longitude,coastal_hazard_centroids.Latitude, correct_by_coast)
-
 ```
 
+Example for Mexico (see MEX_test): 
 ```{r, echo = F, message=FALSE, warning=FALSE}
 library(jpeg);
-img <- readJPEG('C:/WORK_FOLDERS_BGR/26_climada_root_2016_coastal_hazards/code/ex_waves.jpg')
+img <- readJPEG('D:/WORK_FOLDERS_BGR/26_climada_root_2016_coastal_hazards/climada_coastal_hazards_module/code/ex_waves.jpg')
 plot(1:2, type='n',axes=FALSE,ylab='',xlab='')
 rasterImage(img,1,1,2,2)
+```
 
+Some examples for storm surge: 
+```{matlab}
+% read points and create centroids: 
+points = shaperead(centroids_file); 
+
+clear centroids 
+centroids.centroid_ID  = [points(:).ORIG_FID]; 
+centroids.lon = [points(:).X]; 
+centroids.lat = [points(:).Y]; 
+
+% read the coast 
+coast2 = load(climada_global.coastline_file); 
+xcoast=coast2.shapes.X; ycoast=coast2.shapes.Y; 
+
+% save 
+save centroids_units.mat centroids coast 
+
+% now let´s calculate storm surges and waves 
+hazard=[]; % init output
+
+% prep the region we need
+boundingbox = [min(centroids.lon) max(centroids.lon) min(centroids.lat) max(centroids.lat)] ;
+boundingbox = boundingbox + [-0.5 0.5 -0.5 0.5]; 
+
+climada_global.bathy_file = [climada_global.data_coastal_dir,filesep,'etopo1.nc']
+
+surge_models=[1 2 3]; 
+wave_models =[1,2,3]; 
+silent_mode = 1; 
+check_plot = 1; 
+
+% run the models 
+tc_track = aux_historical_storms_MEX; 
+hazard_set_file ='surge_test'
+tic
+hazard  = climada_tc_hazard_surge_StatSims(tc_track,hazard_set_file,centroids,...
+        wave_models, surge_models,silent_mode,check_plot)
+toc 
+```  
+
+This code calculates and plots hazard maps by frequency of occurrence (return periods): 
+
+```{matlab}
+% CALCULATE STATS 
+dirResults = climada_global.results_hazards_dir; 
+check_printplot = 0; 
+
+hazard_stats = climada_hazard_stats_coastal(hazard_tmp,return_periods,'Hs_intensity',...
+                                        check_plot,'HS',check_printplot)
+save_fig(gcf,[dirResults,filesep,'RPmaps_test'],200)
+```  
+
+
+
+#### B. Coastal areas flood and expected damage calculation 
+
+This example reads the entity file (any number of tabs): 
+```{matlab}
+% read the entity file that includes asset value by elevations 
+[entity,entity_save_file] = climada_entity_read_coastal(file_entities,'NOENCODE')
+% we now calculate the value between elevation 0-1, 1-2, 2-3, etc 
+[entity] = climada_entity_calc_diff(entity); 
+
+% we can add units 
+entity.Population.units  = 'habs'; 
+entity.Commercial.units  = 'mill USD'; 
+entity.Industrial.units  = 'mill USD'; 
+entity.Residential.units = 'mill USD'; 
+```  
+
+We can read damage functions in a similar fashion to original climada: 
+```{matlab}
+damagefunctions = climada_damagefunctions_read(damagefunction_filename)
+% let´s plot them 
+climada_damagefunctions_plot_coastal(damagefunctions)
+% add to entity 
+entity.damagefunctions = damagefunctions; 
+```  
+
+These commands show an example to run Expected Damages calculations: 
+```{matlab}
+
+% initial step, pass from generic entity with elevations to the entity structure format for damage calculations
+EDSentity = fun_process_for_EDScalc_coastal(entity,entity_field_names);
+
+fprintf('Activating EDS at centroids... \n');
+climada_global.EDS_at_centroid = 1; % activates results at centroids
+
+return_period = [10 50 100 250 500 1000]; 
+force_re_encode = 0; silent_mode = 0; 
+annotation_name = [char(hazard.comment),'-Entity_',ENTITY_KEY]
+
+% calculate damages for coastal entity EDSentity: 
+EDS=climada_EDS_calc_coastal(EDSentity,hazard,annotation_name,force_re_encode,silent_mode);
+
+% add stats for return periods 
+EDS = climada_EDS_stats(EDS, EDS_save_file, return_period); 
+
+% save results 
+EDS_save_file = [climada_global.results_damages_dir,filesep,'EDS_',annotation_name]; 
+climada_EDS_save(EDS,EDS_save_file)
+
+% save to xls 
+Percentage_Of_Value_Flag = 0; 
+res = climada_EDS_DFC_2xls(EDS,'LOW-CC-Perc',Percentage_Of_Value_Flag,report_file)
+```
+
+This code calculates the Damage Frequency Curve: 
+
+```{matlab}
+return_period=[10 25 50 100 250 500]; 
+check_plot=1; 
+DFCa=[]; 
+DFC  = climada_EDS2DFC(EDSa.present,return_period);
+
+climada_EDS_DFC_coastal(EDS,[]) %  plots EDS
+
+save_fig(gcf,[climada_global.results_damages_dir,filesep,'EDS_curves_test'],200) % saves in png 
+save_fig_formats(gcf,[climada_global.results_damages_dir,filesep,'EDS_curves_test'],200,[1 1]) % saves in png and eps 
+```
+
+And this section shows how to calculate a waterfall graphic for 3 EDS, with custom labels: 
+```{matlab}
+Tr=500; 
+unit_scale = 1; % 1e3 
+units = 'mill.$'% thousands of mill$
+xlabels_descrpt={{'Present';'expected damage'}, {'Incremental increase';'yr 2030'},...
+                     {'Incremental increase';'yr 2050'},{'Total Future Risk'; 'yr 2050'}}; 
+climada_waterfall_graph_coastal(EDS(1),EDS(2),EDS(3),Tr,unit_scale,units,xlabels_descrpt,0,'flood',[800 1600])
+```
+```{r, echo = F, message=FALSE, warning=FALSE}
+library(jpeg);
+img <- readJPEG('D:/WORK_FOLDERS_BGR/26_climada_root_2016_coastal_hazards/climada_coastal_hazards_module/code/waterfall_ex.jpg')
+plot(1:2, type='n',axes=FALSE,ylab='',xlab='')
+rasterImage(img,1,1,2,2)
+```
+
+#### C. Auxiliary functions 
+
+Example for saving in png and eps formats: 
+
+```{matlab}
+resolution = 200 
+pngtp = 1
+epstp = 1 
+save_fig_formats(gcf,[climada_global.results_damages_dir,filesep,'test_figure'],resolution,[pngtp epstp])
 ```
 
 Annex 
