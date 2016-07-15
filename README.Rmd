@@ -214,8 +214,8 @@ save_fig_formats(gcf,[climada_global.results_damages_dir,filesep,'EDS_curves_tes
 And this section shows how to calculate a waterfall graphic for 3 EDS, with custom labels: 
 ```{matlab}
 Tr=500; 
-unit_scale = 1; % 1e3 
-units = 'mill.$'% thousands of mill$
+unit_scale = 1;  % 1e3 
+units = 'mill.$' % thousands of mill$
 xlabels_descrpt={{'Present';'expected damage'}, {'Incremental increase';'yr 2030'},...
                      {'Incremental increase';'yr 2050'},{'Total Future Risk'; 'yr 2050'}}; 
 climada_waterfall_graph_coastal(EDS(1),EDS(2),EDS(3),Tr,unit_scale,units,xlabels_descrpt,0,'flood',[800 1600])

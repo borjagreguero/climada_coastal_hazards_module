@@ -89,7 +89,6 @@ if ~exist('silent_mode','var'),silent_mode=0;end
 
 % PARAMETERS
 %
-
 % prompt for hazard_set if not given
 if isempty(entity) % local GUI
     entity=[climada_global.data_dir filesep 'entities' filesep '*.mat'];
