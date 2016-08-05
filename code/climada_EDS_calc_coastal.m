@@ -123,7 +123,7 @@ if ~isstruct(hazard)
 end
 
 % TOTAL WATER LEVEL IS INTENSITY 
-hazard.intensity = hazard.TWL_intensity; 
+% % % hazard.intensity = hazard.TWL_intensity; 
 hazard=climada_hazard2octave(hazard); % Octave compatibility for -v7.3 mat-files
 % check for consistency of entity and the hazard set it has been encoded to
 % but: one might have used the same centroids for different hazard sets, so
@@ -226,7 +226,8 @@ EDS.hazard.comment  = char(hazard.comment);
 EDS.elevation_array = entity.elevation_array;
 
 EDS.assets.filename = annotation_name;
-EDS.assets.centroid_index = entity_orig.assets(1).centroid_index;
+EDS.assets.centroid_index   = entity_orig.assets(1).centroid_index;
+EDS.assets.centroid_id      = entity_orig.assets(1).centroid_id;
 EDS.assets.lat = entity_orig.assets(1).lat;
 EDS.assets.lon = entity_orig.assets(1).lon;
 EDS.assets.asset_types = entity_orig.asset_types;

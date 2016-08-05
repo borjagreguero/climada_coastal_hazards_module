@@ -31,6 +31,7 @@ for sh = 1:numel(entity_field_names)
     EDSentity.assets(sh).lon = entity.lon; 
     EDSentity.assets(sh).lat = entity.lat; 
     EDSentity.assets(sh).centroid_index = entity.centroid_index; 
+    EDSentity.assets(sh).centroid_id    = entity.centroid_id; 
 
     % now, get asset type 
     temp = getfield(entity,entity_field_names{sh}); 

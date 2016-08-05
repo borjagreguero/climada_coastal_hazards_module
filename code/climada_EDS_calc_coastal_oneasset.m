@@ -240,9 +240,13 @@ for asset_ii=1:nn_assets
     if ~isempty(asset_damfun_pos)
         
         % calculate depths 
-        water_levels = sparse(hazard.TWL_intensity(:,asset_hazard_pos)); 
+        water_levels = sparse(hazard.intensity(:,asset_hazard_pos)); 
+        % IMPORTANT: USES intensity!!!!, so associate previously to total water level or other flood variable
         water_levels(water_levels<0)=0; 
-    
+        water_levels(isnan(water_levels))=0; 
+        
+        if all(full(water_levels)==0), continue, end % no damage, so continue 
+        
         % values for that assets, all elevations 
         Eij = entity.assets.Value_by_elevation(asset_i,:); 
         
