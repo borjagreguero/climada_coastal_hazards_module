@@ -104,6 +104,7 @@ for EDS_i=1:length(EDS)
         if any(res.return_periods~=EDS(EDS_i).R_fit),           error('return periods do not match'), end 
         res.damage(EDS_i,:)           = EDS(EDS_i).damage_fit;
         res.Value(EDS_i)              = EDS(EDS_i).Value;
+        res.AED(EDS_i)                = EDS(EDS_i).ED;
         if Percentage_Of_Value_Flag
             res.perc_damage_of_value(EDS_i,:) = EDS(EDS_i).damage_fit/EDS(EDS_i).Value.*100;
         end
@@ -115,6 +116,7 @@ for EDS_i=1:length(EDS)
 %         res.return_periods(EDS_i,:)   = EDS(EDS_i).return_period;
         res.damage(EDS_i,:)           = EDS(EDS_i).damage;
         res.Value(EDS_i)              = EDS(EDS_i).value;
+        res.AED(EDS_i)                = EDS(EDS_i).ED;
         if Percentage_Of_Value_Flag
             res.perc_damage_of_value(EDS_i,:) = EDS(EDS_i).damage_of_value.*100;
         end
@@ -141,11 +143,11 @@ if ~isempty(report_file)
 %     header_str={'EDS', 'Value'};
     header_str={};
     if Percentage_Of_Value_Flag
-        header_str={'EDS - Damage percentage of Value (%)','Value'};
+        header_str={'EDS - Damage percentage of Value (%)','Value','AED'};
         pct_mult=1/100;
     else
 %         header_str=[header_str 'Damage absolute'];
-        header_str={'EDS - Damage absolute','Value'};
+        header_str={'EDS - Damage absolute','Value','AED'};
         pct_mult=1;
     end
     for RP_i=1:length(res.return_periods)
@@ -168,13 +170,13 @@ if ~isempty(report_file)
 
     header_row = 1; 
     row = 1; 
+    xlswrite(report_file,header_str,SHEET,['A',num2str(header_row)])
     for EDS_i = 1:numel(res.Value)
-        xlswrite(report_file,header_str,SHEET,['A',num2str(header_row)])
         xlswrite(report_file,[res.annotation_name(EDS_i)],SHEET,['A',num2str(row+EDS_i)])
         if Percentage_Of_Value_Flag
-            xlswrite(report_file,[res.Value(EDS_i), res.perc_damage_of_value(EDS_i,:)],SHEET,['B',num2str(row+EDS_i)])
+            xlswrite(report_file,[res.Value(EDS_i), res.AED(EDS_i) res.perc_damage_of_value(EDS_i,:)],SHEET,['B',num2str(row+EDS_i)])
         else
-            xlswrite(report_file,[res.Value(EDS_i), res.damage(EDS_i,:)],SHEET,['B',num2str(row+EDS_i)])
+            xlswrite(report_file,[res.Value(EDS_i), res.AED(EDS_i) res.damage(EDS_i,:) ],SHEET,['B',num2str(row+EDS_i)])
         end
     end
 % % % 	winopen(report_file) 

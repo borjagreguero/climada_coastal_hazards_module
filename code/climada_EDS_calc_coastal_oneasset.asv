@@ -225,9 +225,9 @@ end % CLIMADA_OPT
 
 mod_step=2; % first time estimate after 2 calcs, then every 100
 
-% EDS.CHECK = entity.assets.Value_by_elevation.*0; 
+EDS.CHECK = entity.assets.Value_by_elevation.*0; 
         
-for asset_ii=1:nn_assets
+for asset_ii=191%1:nn_assets
     
     asset_i=valid_assets_pos(asset_ii);
     
@@ -248,12 +248,10 @@ for asset_ii=1:nn_assets
         water_levels(water_levels<0)=0; 
         water_levels(isnan(water_levels))=0; 
         
+        if all(full(water_levels)==0), continue, end % no damage, so continue 
+        
         % values for that assets, all elevations 
         Eij = entity.assets.Value_by_elevation(asset_i,:); 
-        EDS.Value               = EDS.Value+nansum(Eij);
-        EDS.Value_by_elevation  = EDS.Value_by_elevation+Eij;
-            
-        if all(full(water_levels)==0), continue, end % no damage, so continue 
         
         %% ------------------------------------------------------------
         %           CALCULATE FOR TOPOGRAPHY ELEVATIONS 
@@ -266,9 +264,10 @@ for asset_ii=1:nn_assets
         for zz = 1:Nelev 
 %             ind = find(water_levels>=zz1(zz) & water_levels<zz2(zz)); 
             % add values of exposure (entities) 
-%             EDS.Value   = EDS.Value+Eij(zz);
-%             EDS.CHECK(asset_ii,zz)=1; 
-%             EDS.Value_by_elevation(zz) = EDS.Value_by_elevation(zz)+Eij(zz);
+            EDS.Value   = EDS.Value+Eij(zz);
+            EDS.CHECK(asset_ii,zz)=1; 
+            
+            EDS.Value_by_elevation(zz) = EDS.Value_by_elevation(zz)+Eij(zz);
             
             % local water depth 
             hwater = water_levels-zz1(zz); 
