@@ -66,7 +66,6 @@ else %for bed with slpoe
     end
 %     toc
 end
-
 surgeheight=eta(end,1);
 
 %--------------------------------------------------------------------------

@@ -85,7 +85,7 @@ correct_by_coast = 1; % this takes into account only points seawards, important 
 Example for Mexico (see MEX_test): 
 ```{r, echo = F, message=FALSE, warning=FALSE}
 library(jpeg);
-img <- readJPEG('D:/WORK_FOLDERS_BGR/26_climada_root_2016_coastal_hazards/climada_coastal_hazards_module/code/ex_waves.jpg')
+img <- readJPEG('C:/WORK_FOLDERS_BGR/26_climada_root_2016_coastal_hazards/climada_coastal_hazards_module/code/ex_waves.jpg')
 plot(1:2, type='n',axes=FALSE,ylab='',xlab='')
 rasterImage(img,1,1,2,2)
 ```
@@ -222,7 +222,7 @@ climada_waterfall_graph_coastal(EDS(1),EDS(2),EDS(3),Tr,unit_scale,units,xlabels
 ```
 ```{r, echo = F, message=FALSE, warning=FALSE}
 library(jpeg);
-img <- readJPEG('D:/WORK_FOLDERS_BGR/26_climada_root_2016_coastal_hazards/climada_coastal_hazards_module/code/waterfall_ex.jpg')
+img <- readJPEG('C:/WORK_FOLDERS_BGR/26_climada_root_2016_coastal_hazards/climada_coastal_hazards_module/code/waterfall_ex.jpg')
 plot(1:2, type='n',axes=FALSE,ylab='',xlab='')
 rasterImage(img,1,1,2,2)
 ```
