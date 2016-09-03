@@ -402,7 +402,11 @@ if check_plot
 % % %             gridded_VALUE(gridded_VALUE<(0.1)) = NaN;
 % % %             contourf(X, Y, gridded_VALUE,200,'edgecolor','none')
             values(values<(0.1)) = NaN;
-            scatter(centroids.lon,centroids.lat,20,values,'filled')
+            if return_count < 3
+                scatter(centroids.lon,centroids.lat,40,values,'filled')
+            else 
+                scatter(centroids.lon,centroids.lat,20,values,'filled')
+            end
         else
             text(mean([min(centroids.lon) max(centroids.lon)]),...
                 mean([min(centroids.lat ) max(centroids.lat )]),...

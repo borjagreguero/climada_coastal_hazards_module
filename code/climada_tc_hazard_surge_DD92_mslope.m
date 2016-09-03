@@ -130,7 +130,6 @@ if 1-isfield(centroids,'transects'),
 end
 
 depth = 100;  % default parameter 
-
 if 1-isfield(centroids,'mslope')
     warning('no mean slope given')
     if isfield(centroids,'profiles'), 
@@ -141,7 +140,8 @@ if 1-isfield(centroids,'mslope')
         centroids.mslope =centroids.lon.*0+0.002; % 5 perc 
         USE_CENTROIDS_SLOPE = 1; 
     end
-    
+else 
+    USE_CENTROIDS_SLOPE = 1; 
 end
 
 %% INIT 

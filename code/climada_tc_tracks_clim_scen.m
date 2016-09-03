@@ -99,7 +99,7 @@ fint  = ones(1,numel(tc_track)).*nan;
 ffreq = ones(1,numel(tc_track)).*nan; 
 tc_track_out = tc_track; 
 for st=1:numel(tc_track) 
-    disp(num2str(st))
+    if rem(st,500)==0, disp(num2str(st)), end 
     v     = max(tc_track(st).MaxSustainedWind);
     if 1-isnan(v) 
         if strcmp(tc_track(st).MaxSustainedWindUnit,'kn') 
@@ -116,17 +116,16 @@ for st=1:numel(tc_track)
         end
     end
     season_storm(st) = tc_track(st).season;
-    cat_storms  (st) = tc_track(st).category;
-    max_wind    (st)    = max(tc_track(st).MaxSustainedWind);
+    cat_storms_orig(st) = tc_track(st).category;
+    max_wind_orig  (st) = max(tc_track(st).MaxSustainedWind);
     max_wind_out(st)    = max(tc_track_out(st).MaxSustainedWind);
     
     v_cat    = find (max_wind_out(st)  < v_categories2)-2;
-    tc_track_out(st).category_new = v_cat(1);
+    tc_track_out(st).category = v_cat(1);
     
     tc_track_out(st).comment_clim_scen       = comment;
     tc_track_out(st).target_year             = screw.target_year;
     tc_track_out(st).date                    = datestr(now);
-
 end
 
 season_storm = [tc_track(:).season];
@@ -143,7 +142,7 @@ seasons_plot(seasons_plot>2012) = seasons_plot(seasons_plot>2012) - 17768;
 types_=zeros(numel(tc_track),numel(types_categories)); 
 types_new=zeros(numel(tc_track),numel(types_categories)); 
 for st=1:numel(tc_track_out) 
-    ind = find(types_categories==tc_track_out(st).category_new);  
+    ind = find(types_categories==tc_track(st).category);  
     types_(st,ind) = 1; 
     ind = find(types_categories==tc_track_out(st).category); 
     types_new(st,ind) = 1; 
@@ -155,22 +154,28 @@ types_new=nansum(types_new,1)./numel(tc_track_out).*100;
 if check_plot
     fprintf('preparing check plot ...\n');
     figure, 
-    subplot(2,1,1)
-    [count_, bin_] = hist(max_wind,[0:20:300]);
-    h = plot([0 bin_], [0 count_/sum(count_)],'-k'); hold on
-
-    [count_, bin_] = hist(max_wind_out,[0:20:300]);
-    h2 = plot([0 bin_], [0 count_/sum(count_)],'-r'); hold on
-    xlabel('Wind (kn)')
-    ylabel(['Relative count in ' int2str(season_count) ' seasons'])
-    
-    subplot(2,1,2)   
-    bar([types_categories],[types_],.7,'r')
-    hold on 
-    bar([types_categories],[types_new],.5),colormap('gray') 
+    subplot(2,1,1), hold on 
+    [count_, bin_] = hist(max_wind_orig,[20:20:180]);
+    bar(bin_,count_./numel(tc_track_out).*100,'barwidth',0.6,'facecolor',[0.3 0.3 0.3])
+%     h = plot([bin_], [count_/sum(count_)],'-k'); hold on
+    [count_, bin_] = hist(max_wind_out,[20:20:180]);
+    bar(bin_, count_./numel(tc_track_out).*100,'barwidth',0.3,'facecolor',[0.85 0.3 0.3]) 
+%     h2 = plot([bin_], [count_/sum(count_)],'-r'); hold on
+    xlabel('Wind (kn)','fontsize',10)
     legend('Present','Future')
-    xlabel('Storm category')
-    ylabel('% of storms')
+    ylabel(['% in ' int2str(season_count) ' seasons'],'fontsize',10)
+    title(['Wind distribution - ',comment],'fontsize',10)
+    set(gca,'xlim',[20 170],'fontsize',10) 
+    
+    subplot(2,1,2), hold on    
+    bar([types_categories],[types_],.6,'facecolor',[0.3 0.3 0.3])
+    hold on 
+    bar([types_categories],[types_new],.3,'facecolor',[0.85 0.3 0.3]),%colormap('gray') 
+    set(gca,'xticklabel',{'T.D.','T.St.','H1','H2','H3','H4','H5'},'fontsize',10) 
+    xlabel('Storm category','fontsize',10)
+    ylabel('% of storms','fontsize',10)
+    title('Number of storms','fontsize',10)
     set(gca,'ylim',[0 50]) 
+
 end
 

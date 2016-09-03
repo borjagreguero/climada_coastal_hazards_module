@@ -5,12 +5,11 @@ close all; warning off all
 % first run startup.m from climada and then startup_coastal.m
 % invoke climada 
 run('C:\WORK_FOLDERS_BGR\26_climada_root_2016\climada\startup.m')
-run('C:\WORK_FOLDERS_BGR\26_climada_root_2016_coastal_hazards\startup_coastal.m') 
+run('C:\WORK_FOLDERS_BGR\26_climada_root_2016_coastal_hazards\climada_coastal_hazards_module\startup_coastal.m') 
 %%
 % 
 global climada_global
 climada_global.waitbar=0; 
-
 if ~climada_init_vars,return;end % init/import global variables
 
 %% 
@@ -49,6 +48,18 @@ wave_models =[1 2 3];
 hazard_set_file ='surge_test'
 silent_mode = 0; 
 check_plot = 1; 
+
+
+depth = 100; 
+u10 = 200./3.6; % km/h 
+m = 0.00084;           % bed slope = h0/l; 
+check_plot = 1; 
+
+[surge]=fun_SurgeHeightFun(depth,u10,m,check_plot); 
+title('Long wave equation 1D') 
+file=[pwd,filesep,'ex_surge']; 
+set(gcf,'PaperPositionMode','auto','InvertHardcopy','on')
+print(gcf,'-dpng','-r300',file)
 
 % SURGE FIELD 
 hazard  = climada_tc_hazard_surge(tc_track,hazard_set_file,centroids,...
