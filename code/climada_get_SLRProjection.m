@@ -1,4 +1,4 @@
-function output=climada_get_SLRProjection(Xp,Yp)
+function output=climada_get_SLRProjection(Xp,Yp,rcps)
 % climada
 % MODULE:
 %   climada_coastal 
@@ -23,6 +23,9 @@ function output=climada_get_SLRProjection(Xp,Yp)
 % Units: "m"
 %
 % OUTPUTS:
+% Projections of sea level rise, organized in a structure for each RCP 
+% (Representative Concentration Pathways) 
+% 
 % MODIFICATION HISTORY:
 % 	Borja G. Reguero - borjagreguero@gmail.com - 02262016
 %-
@@ -33,16 +36,15 @@ if ~climada_init_vars,return;end
 if ~exist('rcps','var'),rcps ={'RCP26','RCP45','RCP60','RCP85'};end
 if ~exist('check_plot','var'),check_plot =0;end
 
-Nrcps = numel(rcps) 
+Nrcps = numel(rcps); 
 deg=pi/180;
 
 for rcp = 1:Nrcps 
-    disp(rcps{rcp}) 
-    
+    disp([rcps{rcp}]);     
     file = eval(['[climada_global.slr_projections.',rcps{rcp},']']); 
 
 	ncdisp(file)
-    ginfo = ncinfo(file,'totslr_m')
+%     ginfo = ncinfo(file,'totslr_m')
 
     SLR = ncread(file,'totslr_m'); 
     SLR_h = ncread(file,'totslr_h'); % UPPER 90% CONFIDENCE LIMIT 

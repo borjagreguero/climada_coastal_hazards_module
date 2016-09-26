@@ -29,7 +29,7 @@ if ~exist(climada_global.additional_dir,'dir'), mkdir(climada_global.additional_
 
 if exist(climada_coastal_modules_dir,'dir')==7
     climada_global.modules_coastal_dir = deblank(climada_coastal_modules_dir);
-    fprintf('climada_coastal modules found: \n');
+    fprintf('climada_coastal modules found: \n')
     add_dir  = dir(climada_coastal_modules_dir);
     for a_i = 1:length(add_dir)
         dir2add = [climada_coastal_modules_dir filesep add_dir(a_i).name]; 
@@ -58,7 +58,7 @@ end
 fprintf('initializing climada_coastal... ');
 
 %initialises the global variables
-climada_init_vars_coastal;
+climada_init_vars_coastal; 
 
 % fprintf('Activating EDS at centroids... ');
 % climada_global.EDS_at_centroid = 1; 

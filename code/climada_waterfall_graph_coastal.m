@@ -1,4 +1,4 @@
-function  fig = climada_waterfall_graph_coastal(EDS1, EDS2, EDS3, return_period, unit_scale,units,xlabels_descrpt, check_printplot,type_hazard,y_axis_limits)
+function  [fig, damage_disp] = climada_waterfall_graph_coastal(EDS1, EDS2, EDS3, return_period, unit_scale,units,xlabels_descrpt, check_printplot,type_hazard,y_axis_limits)
 % waterfall figure, expected damage for specified return period for 
 % - today,
 % - increase from economic growth, 
@@ -203,7 +203,7 @@ fontsize_2 = fontsize_ - 3;
 % stretch    = 0.3;
 stretch    = 0.3;
 
-fig        = climada_figuresize(0.7,1.0);
+fig        = climada_figuresize(0.4,1.0);
 % yellow - red color scheme
 switch type_hazard
     case 'wind'

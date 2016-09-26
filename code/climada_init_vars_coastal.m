@@ -71,7 +71,7 @@ if length(climada_coastal_vars_initialised)<1 % initialise and check only first 
     % set and check the directory tree
     % --------------------------------
     
-    climada_global.data_coastal_dir=[fileparts(climada_global.root_coastal_dir) filesep 'DATA'];
+    climada_global.data_coastal_dir=[fileparts(climada_global.root_coastal_dir) filesep 'DATA_all'];
     alternative_data_dir=[fileparts(climada_global.root_coastal_dir) filesep 'climada_data'];
     
     if exist(alternative_data_dir,'dir')

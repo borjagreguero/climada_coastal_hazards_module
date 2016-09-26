@@ -261,10 +261,17 @@ for track_i=1:length(tc_track) %[981 1002 1358 ]
     
     % 1391 = IKE 
     hazard.orig_event_count         = hazard.orig_event_count+tc_track(track_i).orig_event_flag;
+    hazard.orig_event_flag(track_i) = tc_track(track_i).orig_event_flag;
+    
+    hazard.yyyy(track_i)            = tc_track(track_i).yyyy(1);
+    hazard.mm(track_i)              = tc_track(track_i).mm(1);
+    hazard.dd(track_i)              = tc_track(track_i).dd(1);
+    hazard.datenum(track_i)         = tc_track(track_i).datenum(1);
+    hazard.name{track_i}            = tc_track(track_i).name;
+    
     % PASS IF IT HAS NO CENTRAL PRESSURE 
     if all(isnan(tc_track(track_i).CentralPressure)==1), continue, end
 %     disp(track_i) 
-    hazard.orig_event_flag(track_i) = tc_track(track_i).orig_event_flag;
     
     % ---------------------------------------------------------------------
     % INTERNAL CONTROL PARAMETERS FOR TESTING CODE
