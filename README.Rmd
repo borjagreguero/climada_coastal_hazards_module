@@ -17,7 +17,7 @@ Author: Borja G. Reguero - borjagreguero@gmail.com - University of California, S
 
 Date of last update: July, 8 
 
-Climada stands for climate adaptation and is a probabilistic natural catastrophe damage model. Information on the core package can be found at <https://github.com/davidnbresch/climada/wiki>. This module add specific features for coastal zones. 
+'Climada' stands for 'climate adaptation' and is a probabilistic natural catastrophe damage model. Information on the core package can be found at <https://github.com/davidnbresch/climada/wiki>. This module add specific features for coastal zones. 
 
 ## Description
 This module adds specific functions to the climada suite that are particularly interesting for coastal areas and coastal risks. The functions and tools in this module work with the climada main core functions and applications (i.e. you need to have climada installed). 

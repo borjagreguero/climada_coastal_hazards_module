@@ -21,6 +21,8 @@ function ok=climada_init_vars_coastal(reset_flag)
 global climada_global
 persistent climada_coastal_vars_initialised % used to communicate status of initialisation
 
+ok=1;
+
 % PARAMETERS
 %
 
@@ -71,10 +73,10 @@ if length(climada_coastal_vars_initialised)<1 % initialise and check only first 
     % set and check the directory tree
     % --------------------------------
     
-    climada_global.data_coastal_dir=[fileparts(climada_global.root_coastal_dir) filesep 'DATA_all'];
-    alternative_data_dir=[fileparts(climada_global.root_coastal_dir) filesep 'climada_data'];
+    climada_global.data_coastal_dir=[fileparts(climada_global.root_coastal_dir) filesep 'climada_coastal_hazards_DATA'];
+    alternative_data_dir=[fileparts(climada_global.root_coastal_dir) filesep 'data'];
     
-    if exist(alternative_data_dir,'dir')
+    if not(exist(climada_global.data_coastal_dir,'dir'))
         fprintf('\nNOTE: switched to data dir %s\n',alternative_data_dir);
         climada_global.data_coastal_dir=alternative_data_dir;
     end
@@ -83,7 +85,7 @@ if length(climada_coastal_vars_initialised)<1 % initialise and check only first 
     end
     climada_global.system_coastal_dir=[climada_global.data_coastal_dir filesep 'system'];
     if ~exist(climada_global.system_coastal_dir,'dir')
-        fprintf('WARNING: please create %s manually\n',climada_global.system_coastal_dir);
+        fprintf('WARNING: please create "%s" manually\n',climada_global.system_coastal_dir);
     end
     
     % the global bathy file (etopo) - see ETOPO README in data folder 
