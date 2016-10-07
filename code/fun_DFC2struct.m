@@ -1,5 +1,5 @@
 function [S] = fun_DFC2struct(DFC_at_centroids,shp)
-% previously DFC = climada_EDS2DFC(DFC_at_centroids,return_period); 
+% 
 % reads a shapefile strurcture and saves DFC results--> Return periods and
 % Expected damage 
 % joins by Same Ids in shp and DFC at centroids 
