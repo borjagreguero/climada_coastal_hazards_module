@@ -81,7 +81,7 @@ function hazard  = climada_tc_hazard_surge(tc_track,hazard_set_file,centroids,..
 % init global variables
 global climada_global
 if ~climada_init_vars,return;end
-dirout = [climada_global.results_hazards_dir,filesep,'outputs_single_storms']; 
+dirout = [climada_global.results_coastal_dir,filesep,'outputs_single_storms']; 
 if exist(dirout    ,'dir')==0, mkdir(dirout); end 
 
 hazard = []; % init
@@ -98,13 +98,13 @@ if ~exist('silent_mode'    ,'var'), silent_mode     = 0;  end
 % models for waves --> 
 %       1 = Bretschneider (1990) 
 %       2 = Young
-%       3 = SPM REVISED]
+%       3 = SPM REVISED]check_plot
 if ~exist('wave_models'    ,'var') || isempty(wave_models),  wave_models     = [1 2 3  ];   end 
 %-----------------------------------------------------
 
 %-----------------------------------------------------
 % models for surges --> 
-%       1 =  SLOSH regression, 
+%       1 = SLOSH regression, 
 %       2 = CENAPRED regr., 
 %       3 = Dean&Dalr.92 1D eq, 
 %       4 = Dean&Dalr.92 - with mean slope - simplified 3 (requires good
