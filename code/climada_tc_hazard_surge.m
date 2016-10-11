@@ -81,8 +81,10 @@ function hazard  = climada_tc_hazard_surge(tc_track,hazard_set_file,centroids,..
 % init global variables
 global climada_global
 if ~climada_init_vars,return;end
-dirout = [climada_global.results_coastal_dir,filesep,'outputs_single_storms']; 
-if exist(dirout    ,'dir')==0, mkdir(dirout); end 
+
+% activate to save outputs of each storm 
+% % % dirout = [climada_global.results_coastal_dir,filesep,'outputs_single_storms']; 
+% % % if exist(dirout    ,'dir')==0, mkdir(dirout); end 
 
 hazard = []; % init
 
