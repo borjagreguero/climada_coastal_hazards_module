@@ -87,9 +87,8 @@ correct_by_coast = 1; % this takes into account only points seawards, important 
 ```
 
 Example for Mexico (see MEX examples in folder /test_code/): 
-```{}
-![alt tag](https://github.com/borjagreguero/climada_coastal_hazards_module\results\outputs_single_storms\Hs_Map_DEAN_Pos3.png)
-```  
+![alt tag](https://github.com/borjagreguero/climada_coastal_hazards_module/results/outputs_single_storms/Hs_Map_DEAN_Pos3.png)
+
 
 Some examples for storm surge generation: 
 ```{matlab}

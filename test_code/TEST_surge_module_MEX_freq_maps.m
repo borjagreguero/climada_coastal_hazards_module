@@ -79,6 +79,7 @@ hazard  = climada_tc_hazard_surge(tc_track(track_i),hazard_set_file,centroids,..
     wave_models, surge_models, silent_mode,check_plot)
 
 % all storms with no graphics 
+close all, 
 check_plot = 0; 
 % limit the number of storms 
 tc_track = tc_track(1000:1400);
