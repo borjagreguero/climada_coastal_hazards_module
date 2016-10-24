@@ -56,7 +56,7 @@ a) Historical data from Losada et al 2013. This dataset is distributed with the 
 
 b) Sea level rise projections for Representative Concentration Pathways. The values correspond to mean value of projection (central estimate), and total sea level rise.
 
-Original source: IPCC, AR5, Church et al 2013. 
+Original source: IPCC, AR5, Church et al 2013. See http://www.ipcc.ch/report/ar5/wg1/ and data portal http://www.ipcc-data.org/ 
 This dataset is distributed with the module in github. 
 
  
@@ -65,7 +65,7 @@ This dataset is distributed with the module in github.
 
 Glacial Isostatic Adjustment (GIA) correction for land uplift/subidence. Values correspond to average values between Peltier et al. 2004 GIA field and the GIA field based on Lambeck ice history, using modified ANU model (see SM13 for details), according to Ch13, AR5. GIA_ICE5G change in sea level between 1986-2005 and 2081-2100, in meters (m)
 
-Original source:IPCC, AR5, Church et al 2013 and Peltier 2004.  
+Original source:IPCC, AR5, Church et al 2013 and Peltier 2004. See http://www.ipcc.ch/report/ar5/wg1/ and data portal http://www.ipcc-data.org/  
 
 Distributed with the module in github. 
 
