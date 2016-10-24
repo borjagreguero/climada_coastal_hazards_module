@@ -192,7 +192,7 @@ xlabels_descrpt={{'Present';'expected damage'}, {'Incremental increase';'yr 2030
                      {'Incremental increase';'yr 2050'},{'Total Future Risk'; 'yr 2050'}}; 
 climada_waterfall_graph_coastal(EDS(1),EDS(2),EDS(3),Tr,unit_scale,units,xlabels_descrpt,0,'flood',[800 1600])
 ```
-![alt tag](/doc/waterfall_ex.png?raw=true "Risk Waterfall example")
+![alt tag](/docs/waterfall_ex.png?raw=true "Risk Waterfall example")
 
 #### C. Auxiliary functions 
 
