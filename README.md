@@ -192,13 +192,7 @@ xlabels_descrpt={{'Present';'expected damage'}, {'Incremental increase';'yr 2030
                      {'Incremental increase';'yr 2050'},{'Total Future Risk'; 'yr 2050'}}; 
 climada_waterfall_graph_coastal(EDS(1),EDS(2),EDS(3),Tr,unit_scale,units,xlabels_descrpt,0,'flood',[800 1600])
 ```
-
-```{r, echo = F, message=FALSE, warning=FALSE}
-library(jpeg);
-img <- readJPEG('D:/WORK_FOLDERS_BGR/26_climada_root_2016_coastal_hazards/climada_coastal_hazards_module/code/waterfall_ex.jpg')
-plot(1:2, type='n',axes=FALSE,ylab='',xlab='')
-rasterImage(img,1,1,2,2)
-```
+![alt tag](/doc/waterfall_ex.png?raw=true "Risk Waterfall example")
 
 #### C. Auxiliary functions 
 
