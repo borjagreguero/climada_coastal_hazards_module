@@ -83,8 +83,11 @@ global climada_global
 if ~climada_init_vars,return;end
 
 % activate to save outputs of each storm 
-% % % dirout = [climada_global.results_coastal_dir,filesep,'outputs_single_storms']; 
-% % % if exist(dirout    ,'dir')==0, mkdir(dirout); end 
+dirout = [climada_global.results_coastal_dir,filesep,'outputs_single_storms']; 
+
+if check_plot
+    if exist(dirout    ,'dir')==0, mkdir(dirout); end 
+end
 
 hazard = []; % init
 
@@ -393,25 +396,31 @@ for track_i=1:length(tc_track) %[981 1002 1358 ]
             coast.lon = [coast.shapes(:).X]; 
             coast.lat = [coast.shapes(:).Y]; 
 
-            figure('Visible','on'), hold on
-            LL = 1; 
-            scatter(hazard.lon(:), hazard.lat(:),30,hazard.surge3(track_i,:),'filled')
-            colorbar 
-            plot(coast.lon, coast.lat,'-k')
-            axis([min(hazard.lon)-LL max(hazard.lon)+LL min(hazard.lat(:))-LL max(hazard.lat)+LL])
-            set(gca,'fontsize',8)
-            xlabel('Lon'), ylabel('Lat'), grid on, box on 
-            title(['SURGE - D&D92 - ',deblank(tc_track_sim.name)])
+            if exist('res3','var') 
+                figure('Visible','on'), hold on
+                LL = 1; 
+                scatter(hazard.lon(:), hazard.lat(:),30,hazard.surge3(track_i,:),'filled')
+                colorbar 
+                plot(coast.lon, coast.lat,'-k')
+                axis([min(hazard.lon)-LL max(hazard.lon)+LL min(hazard.lat(:))-LL max(hazard.lat)+LL])
+                set(gca,'fontsize',8)
+                xlabel('Lon'), ylabel('Lat'), grid on, box on 
+                title(['SURGE - D&D92 - ',deblank(tc_track_sim.name)])
+                save_fig(gcf,[dirout,filesep,'Surge_DaD92_',deblank(tc_track_sim.name)],200)
+            end
+            if exist('res2','var') 
+                figure('Visible','on'), hold on
+                LL = 1; 
+                scatter(hazard.lon(:), hazard.lat(:),30,hazard.surge2(track_i,:),'filled')
+                colorbar 
+                plot(coast.lon, coast.lat,'-k')
+                axis([min(hazard.lon)-LL max(hazard.lon)+LL min(hazard.lat(:))-LL max(hazard.lat)+LL])
+                set(gca,'fontsize',8)
+                xlabel('Lon'), ylabel('Lat'), grid on, box on 
+                title(['SURGE - CENAPRED- ',deblank(tc_track_sim.name)])
+                save_fig(gcf,[dirout,filesep,'Surge_CENAPRED_',deblank(tc_track_sim.name)],200)
+            end
             
-            figure('Visible','on'), hold on
-            LL = 1; 
-            scatter(hazard.lon(:), hazard.lat(:),30,hazard.surge2(track_i,:),'filled')
-            colorbar 
-            plot(coast.lon, coast.lat,'-k')
-            axis([min(hazard.lon)-LL max(hazard.lon)+LL min(hazard.lat(:))-LL max(hazard.lat)+LL])
-            set(gca,'fontsize',8)
-            xlabel('Lon'), ylabel('Lat'), grid on, box on 
-            title(['SURGE - CENAPRED- ',deblank(tc_track_sim.name)])
         end
 
         % 4) Dean and Dalrymple 1992, eq long wave shoaling in profile 
@@ -447,11 +456,11 @@ for track_i=1:length(tc_track) %[981 1002 1358 ]
 
         % --------------------------------------------------------------------
         % save temporary file for each storm 
-        if 1-isempty(dirout)
-            keyout_storms = [hazard_set_file,'_st']; 
-            savecommand=['save ',dirout,filesep,keyout_storms,num2str(track_i),'.mat res*']; 
-            eval(savecommand) 
-        end
+% % %         if 1-isempty(dirout)
+% % %             keyout_storms = [hazard_set_file,'_st']; 
+% % %             savecommand=['save ',dirout,filesep,keyout_storms,num2str(track_i),'.mat res*']; 
+% % %             eval(savecommand) 
+% % %         end
         % --------------------------------------------------------------------
    
     hazard.coastal_event_count         = hazard.coastal_event_count + tc_track(track_i).orig_event_flag;
@@ -500,6 +509,8 @@ end
 hazard.frequency          = ones(1,hazard.event_count)*event_frequency; % not transposed, just regular
 hazard.matrix_density     = nnz(hazard.surgePr)/numel(hazard.surgePr);
 hazard.surgefield_comment = msgstr;
+hazard.surgefield_models  = {'1:SLOSH', '2:CENAPRED','3:Dean and Dalrymple 1992'};
+
 hazard.filename           = hazard_set_file;
 hazard.reference_year     = hazard_reference_year;
 

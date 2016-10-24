@@ -379,10 +379,8 @@ if check_plot
     
     % colorbar
     subaxis(2);
-    if rem(y_no,2)==0 || y_no ==1 
-        pos1 = get(subaxis(1),'pos');
-        pos2 = get(subaxis(y_no),'pos');
-        pos = mean([pos1; pos2]); 
+    if rem(y_no,2)==0, 
+        pos = get(subaxis(2),'pos');
     else
         pos = get(subaxis(2),'pos');
     end

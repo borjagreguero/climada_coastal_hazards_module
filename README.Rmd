@@ -15,7 +15,7 @@ Climada - Coastal Hazards Module
 
 Author: Borja G. Reguero - borjagreguero@gmail.com - University of California, Santa Cruz 
 
-Date of last update: July, 8 
+Date of last update: October, 24
 
 'Climada' stands for 'climate adaptation' and is a probabilistic natural catastrophe damage model. Information on the core package can be found at <https://github.com/davidnbresch/climada/wiki>. This module add specific features for coastal zones. 
 
@@ -59,6 +59,10 @@ Other functions help to plot and save figures, help with different operations an
 - save matlab data from ascii format to raster (requires installing aux_modules)
 - other wave climate tools for multivariate climate analysis (requires installing aux_modules) 
 
+## Data for the module 
+The module includes the require data to calculate waves and surges from cyclones, as well as sea level rise estimates. However, for astronomical tides and elevation data, consult the document 'README_to_download_data.md' to see how to download and save data in a 
+
+
 ## How to use 
 
 #### A. Hazard Simulation
@@ -82,7 +86,7 @@ correct_by_coast = 1; % this takes into account only points seawards, important 
 [output]=climada_get_GlobalWaveClimate(coastal_hazard_centroids.Longitude,coastal_hazard_centroids.Latitude, correct_by_coast)
 ```
 
-Example for Mexico (see MEX_test): 
+Example for Mexico (see MEX examples in folder /test_code/): 
 ```{r, echo = F, message=FALSE, warning=FALSE}
 library(jpeg);
 img <- readJPEG('D:/WORK_FOLDERS_BGR/26_climada_root_2016_coastal_hazards/climada_coastal_hazards_module/code/ex_waves.jpg')
@@ -90,56 +94,28 @@ plot(1:2, type='n',axes=FALSE,ylab='',xlab='')
 rasterImage(img,1,1,2,2)
 ```
 
-Some examples for storm surge: 
+Some examples for storm surge generation: 
 ```{matlab}
-% read points and create centroids: 
-points = shaperead(centroids_file); 
+% select all models for testing 
+surge_models=[1 2 3]; % see documentation 
+wave_models =[1 2 3]; % see documentation 
 
-clear centroids 
-centroids.centroid_ID  = [points(:).ORIG_FID]; 
-centroids.lon = [points(:).X]; 
-centroids.lat = [points(:).Y]; 
+track_i = 1371;  % DEAN 
 
-% read the coast 
-coast2 = load(climada_global.coastline_file); 
-xcoast=coast2.shapes.X; ycoast=coast2.shapes.Y; 
-
-% save 
-save centroids_units.mat centroids coast 
-
-% now let´s calculate storm surges and waves 
-hazard=[]; % init output
-
-% prep the region we need
-boundingbox = [min(centroids.lon) max(centroids.lon) min(centroids.lat) max(centroids.lat)] ;
-boundingbox = boundingbox + [-0.5 0.5 -0.5 0.5]; 
-
-climada_global.bathy_file = [climada_global.data_coastal_dir,filesep,'etopo1.nc']
-
-surge_models=[1 2 3]; 
-wave_models =[1,2,3]; 
-silent_mode = 1; 
+% calc 1 storm with graphics 
 check_plot = 1; 
-
-% run the models 
-tc_track = aux_historical_storms_MEX; 
-hazard_set_file ='surge_test'
-tic
-hazard  = climada_tc_hazard_surge_StatSims(tc_track,hazard_set_file,centroids,...
-        wave_models, surge_models,silent_mode,check_plot)
-toc 
+hazard  = climada_tc_hazard_surge(tc_track(track_i),hazard_set_file,centroids,...
+    wave_models, surge_models, silent_mode,check_plot)
+    
 ```  
 
 This code calculates and plots hazard maps by frequency of occurrence (return periods): 
-
 ```{matlab}
 % CALCULATE STATS 
-dirResults = climada_global.results_hazards_dir; 
+dirResults = climada_global.results_coastal_dir; 
 check_printplot = 0; 
 
-hazard_stats = climada_hazard_stats_coastal(hazard_tmp,return_periods,'Hs_intensity',...
-                                        check_plot,'HS',check_printplot)
-save_fig(gcf,[dirResults,filesep,'RPmaps_test'],200)
+hazard_stats = climada_hazard_stats_coastal(hazard_stats,return_periods,'TWL_intensity',check_plot,'Total Water Level')
 ```  
 
 
@@ -150,7 +126,8 @@ This example reads the entity file (any number of tabs):
 ```{matlab}
 % read the entity file that includes asset value by elevations 
 [entity,entity_save_file] = climada_entity_read_coastal(file_entities,'NOENCODE')
-% we now calculate the value between elevation 0-1, 1-2, 2-3, etc 
+
+% now calculates the value between elevation 0-1, 1-2, 2-3, etc 
 [entity] = climada_entity_calc_diff(entity); 
 
 % we can add units 
@@ -220,6 +197,7 @@ xlabels_descrpt={{'Present';'expected damage'}, {'Incremental increase';'yr 2030
                      {'Incremental increase';'yr 2050'},{'Total Future Risk'; 'yr 2050'}}; 
 climada_waterfall_graph_coastal(EDS(1),EDS(2),EDS(3),Tr,unit_scale,units,xlabels_descrpt,0,'flood',[800 1600])
 ```
+
 ```{r, echo = F, message=FALSE, warning=FALSE}
 library(jpeg);
 img <- readJPEG('D:/WORK_FOLDERS_BGR/26_climada_root_2016_coastal_hazards/climada_coastal_hazards_module/code/waterfall_ex.jpg')

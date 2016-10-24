@@ -81,7 +81,7 @@ hazard  = climada_tc_hazard_surge(tc_track(track_i),hazard_set_file,centroids,..
 % all storms with no graphics 
 check_plot = 0; 
 % limit the number of storms 
-tc_track = tc_track(1000:1400);
+tc_track = tc_track(1300:1400);
 
 % run them all 
 hazard  = climada_tc_hazard_surge(tc_track,hazard_set_file,centroids,...
@@ -89,35 +89,23 @@ hazard  = climada_tc_hazard_surge(tc_track,hazard_set_file,centroids,...
 
 % now calculate hazard.TWL_intensity combining the components. 
 hazard.TWL_intensity = 1.*hazard.surgePr + hazard.surge3 + 0.17.*hazard.Hs2; 
-hazard.Hs_intensity = hazard.Hs2; 
-hazard.SS_intensity = hazard.surge3; 
-
-% NOTE: you may want to add here the sea level rise, subsidence or a
+% note: you may want to add here the sea level rise, subsidence or a
 % coastal protection correction, for ex. wave attenuation by reefs. 
 % Also, the average from different models can be used to calculate an
-% integrated metric and correct for variations between models. 
+% integrated metric and correct for variations be
 
-%% frequency maps
-disp(['only can calculate to ',num2str(hazard.orig_years),' years']) 
-return_periods =[ 2 5 ]
+%% frequency maps 
+hazard_stats = climada_hazard_stats_coastal(hazard_tmp,return_periods,'Hs_intensity',...
+                                        check_plot,'HS',check_printplot)
+save_fig(gcf,[dirResults,filesep,'RPmaps HS - ',comment,version_],200)
+     
+hazard_stats = climada_hazard_stats_coastal(hazard_stats,return_periods,'SS_intensity',...
+                                        check_plot,'SS',check_printplot)
+save_fig(gcf,[dirResults,filesep,'RPmaps SS - ',comment,version_],200)
 
-check_printplot = 1
-check_plot      = 1
+hazard_stats = climada_hazard_stats_coastal(hazard_stats,return_periods,'TWL_intensity',...
+                                        check_plot,'TWL',check_printplot)
+save_fig(gcf,[dirResults,filesep,'RPmaps TWL - ',comment,version_],200)
 
-% Hs 
-hazard_stats = climada_hazard_stats_coastal(hazard,return_periods,'Hs_intensity',check_plot,'HS')
-if check_printplot
-    save_fig(gcf,[climada_global.results_coastal_dir,filesep,'test RPmaps HS'],100)
-end
+return 
 
-% surge
-hazard_stats = climada_hazard_stats_coastal(hazard_stats,return_periods,'SS_intensity',check_plot,'SS')
-if check_printplot
-    save_fig(gcf,[climada_global.results_coastal_dir,filesep,'test RPmaps SS'],100)
-end
-
-% TWL 
-hazard_stats = climada_hazard_stats_coastal(hazard_stats,return_periods,'TWL_intensity',check_plot,'TWL')
-if check_printplot
-    save_fig(gcf,[climada_global.results_coastal_dir,filesep,'test RPmaps TWL'],100)
-end
