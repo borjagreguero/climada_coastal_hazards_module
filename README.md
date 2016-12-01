@@ -24,7 +24,7 @@ This module adds specific functions to the climada suite that are particularly i
 
 Some functions have been modified from core climada original functions and adapted to more user specific needs and further customization. 
 
-# Core elements {.tabset .tabset-fade .tabset-pills}
+# Core elements 
 
 ## Hazard Simulation 
 
