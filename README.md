@@ -19,14 +19,14 @@ Date of last update: October, 24
 
 'Climada' stands for 'climate adaptation' and is a probabilistic natural catastrophe damage model. Information on the core package can be found at <https://github.com/davidnbresch/climada/wiki>. This module add specific features for coastal zones. 
 
-## Description
+# Description
 This module adds specific functions to the climada suite that are particularly interesting for coastal areas and coastal risks. The functions and tools in this module work with the climada main core functions and applications (i.e. you need to have climada installed). 
 
 Some functions have been modified from core climada original functions and adapted to more user specific needs and further customization. 
 
-## Core elements {.tabset .tabset-fade .tabset-pills}
+# Core elements {.tabset .tabset-fade .tabset-pills}
 
-### Hazard Simulation 
+## Hazard Simulation 
 
 ** A. Hazard Simulation **
 
@@ -39,7 +39,7 @@ There is a family of functions that help to assess different coastal hazards, na
 - Hurricane wind waves: generates wave fields (wave height and periods) for hurricanes using three different methods.  
 - Global Waves (additional module and data): calculates main statistics of global wave climate based on Reguero et al (2012) and (2015). 
 
-### Coastal flood and expected damages calculation 
+## Coastal flood and expected damages calculation 
 
 ** B. Coastal areas flood and expected damage calculation ** 
 
@@ -47,7 +47,7 @@ Another set of functions helps to calculate damages from an entity dataset that 
 
 This entity curves represent the socioeconomic exposure curves must be calculate upfront and form the input for the model. This is usually done in GIS or other tools (email authors for guidance if needed). 
 
-###  Auxiliary functions 
+##  Auxiliary functions 
 
 ** C. Auxiliary functions **
 
@@ -59,13 +59,13 @@ Other functions help to plot and save figures, help with different operations an
 - save matlab data from ascii format to raster (requires installing aux_modules)
 - other wave climate tools for multivariate climate analysis (requires installing aux_modules) 
 
-## Data for the module 
+# Data for the module 
 The module includes the require data to calculate waves and surges from cyclones, as well as sea level rise estimates. However, for astronomical tides and elevation data, consult the document 'README_to_download_data.md' to see how to download and save data in a 
 
 
-## How to use 
+# How to use 
 
-#### A. Hazard Simulation
+## A. Hazard Simulation
 
 ```{matlab}
 % get SLR projection by end of century 
@@ -114,8 +114,7 @@ hazard_stats = climada_hazard_stats_coastal(hazard_stats,return_periods,'TWL_int
 ```  
 
 
-
-#### B. Coastal areas flood and expected damage calculation 
+## B. Coastal areas flood and expected damage calculation 
 
 This example reads the entity file (any number of tabs): 
 ```{matlab}
@@ -194,7 +193,7 @@ climada_waterfall_graph_coastal(EDS(1),EDS(2),EDS(3),Tr,unit_scale,units,xlabels
 ```
 ![alt tag](/docs/waterfall_ex.jpg?raw=true "Risk Waterfall example")
 
-#### C. Auxiliary functions 
+## C. Auxiliary functions 
 
 Example for saving in png and eps formats: 
 
@@ -208,7 +207,7 @@ save_fig_formats(gcf,[climada_global.results_damages_dir,filesep,'test_figure'],
 Annex 
 ==========================================
 
-### Coastal hazard points example: 
+## Coastal hazard points example: 
 Name: *coastal_hazard_centroids.mat* 
 
 Type: Npx1 structure 
@@ -228,7 +227,7 @@ Additionaly:
 
 Aux. script: *process_SpUnits_HazardPts.m*
 
-### Spatial units example: 
+## Spatial units example: 
 Define where flooding will be calculated. Include 1 or more hazard points. 
 
 Name: *association_spatialunits.mat*
@@ -245,7 +244,7 @@ Fields:
 
 Aux. script: *process_SpUnits_HazardPts.m*
 
-### Bathymetry options 
+## Bathymetry options 
 
 File: *create_bathymetry.m* 
 
