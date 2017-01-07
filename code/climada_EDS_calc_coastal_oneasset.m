@@ -13,7 +13,7 @@ function EDS=climada_EDS_calc_coastal_oneasset(entity,hazard,annotation_name,for
 %   given an encoded entity (assets and damage functions) and a hazard
 %   event set, calculate the event damage set (EDS). The event damage set
 %   contains the event damage for each hazard event. In case you set
-%   climada_global.EDS_at_centroid=1, the damage is also stored for each
+%   climada_global.damage_at_centroid=1, the damage is also stored for each
 %   event at each centroids (be aware of memory implications). The exepcted
 %   damage is always stored at each centroid, see EDS.ED_at_centroid.
 %
@@ -73,6 +73,7 @@ function EDS=climada_EDS_calc_coastal_oneasset(entity,hazard,annotation_name,for
 %       annotation_name: a kind of default title (sometimes empty)
 % MODIFICATION HISTORY:
 % Borja G. Reguero - borjagreguero@gmail.com - creation 
+% David N. Bresch, david.bresch@gmail.com, 20170107, damage_at_centroid renamed to damage_at_centroid
 %-
 
 global climada_global
@@ -189,7 +190,7 @@ EDS.frequency         = hazard.frequency;
 EDS.orig_event_flag   = hazard.orig_event_flag;
 EDS.peril_ID          = char(hazard.peril_ID);
 EDS.hazard.peril_ID   = EDS.peril_ID; % backward compatibility
-if climada_global.EDS_at_centroid
+if climada_global.damage_at_centroid
     EDS.damage_at_centroid     = sparse(zeros(n_assets, hazard.event_count));
     % allocate the damage per centroid array (sparse, to manage memory)
 % % %     damage_at_centroid_density = 0.03; % 3% sparse damage per centroid array density (estimated)
@@ -308,7 +309,7 @@ for asset_ii=1:nn_assets
                 end
                 EDS.damage = EDS.damage+temp_damage'; % add to the EDS
                 EDS.damage_by_elevation(zz,:) = EDS.damage_by_elevation(zz,:)+temp_damage'; % add to EDS by elevation 
-                if climada_global.EDS_at_centroid
+                if climada_global.damage_at_centroid
 %                     EDS.damage_at_centroid(:,asset_i) = temp_damage'; % add to EDS damage at centroids
                     EDS.damage_at_centroid(asset_i,:) = EDS.damage_at_centroid(asset_i,:)+ temp_damage'; % add to EDS damage at centroids
 %                     index_ = j == asset_i; %index_ = i == asset_i;
@@ -330,7 +331,7 @@ for asset_ii=1:nn_assets
             %%fprintf('%i, max MDD %f, PAA %f, ED %f\n',asset_i,max(full(MDD)),max(full(PAA)),full(sum(temp_damage'.*EDS.frequency)));
         end
         % calculate Expected DAmage ED at centroids 
-        if climada_global.EDS_at_centroid 
+        if climada_global.damage_at_centroid 
             % NOTE: Difference - saves EDS.damage_at_centroid
             EDS.ED_at_centroid(asset_i,1) =full(sum( EDS.damage_at_centroid(asset_i,:).*EDS.frequency)); 
         else
@@ -397,7 +398,7 @@ EDS.ED_by_elevation = full(sum(bsxfun(@times, EDS.damage_by_elevation, EDS.frequ
 %  CHECK 
 %  (sum(EDS.ED_by_elevation)-EDS.ED)<0.01
 
-if climada_global.EDS_at_centroid
+if climada_global.damage_at_centroid
 %     EDS.damage_at_centroid = sparse(i,j,x,hazard.event_count,n_assets);
 %     EDS.damage_at_centroid = EDS.damage_at_centroid;
     EDS.ED_at_centroid     = full(sum(bsxfun(@times, EDS.damage_at_centroid, EDS.frequency),2));
