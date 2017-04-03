@@ -93,10 +93,10 @@ for ii=1:Np %loop over each point
             % 2..2. polygon for area of influence --> seawards from land! 
             [as1]=aL/deg+100;  % angle offshore
             [as2]=aL/deg-100;  % angle offshore        
-            [dx1,dy1]=pol2cart(as1*deg,r);  x1=x0+dx1; y1=y0+dy1;  
-            [dx2,dy2]=pol2cart(as2*deg,r);  x2=x0+dx2; y2=y0+dy2; 
+            [dx1,dy1]=pol2cart_ch(as1*deg,r);  x1=x0+dx1; y1=y0+dy1;  
+            [dx2,dy2]=pol2cart_ch(as2*deg,r);  x2=x0+dx2; y2=y0+dy2; 
 
-            [dx1,dy1]=pol2cart((as2:0.5:as1).*deg,r);  x1=x0+dx1; y1=y0+dy1;  
+            [dx1,dy1]=pol2cart_ch((as2:0.5:as1).*deg,r);  x1=x0+dx1; y1=y0+dy1;  
             polygon=[x0,y0;x1(:),y1(:);x2(:),y2(:);x0,y0];
         
             if check_plot % plot area of search 

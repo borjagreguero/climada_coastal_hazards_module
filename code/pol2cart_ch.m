@@ -1,4 +1,4 @@
-function [x,y,z] = pol2cart(th,r,z)
+function [x,y,z] = pol2cart_ch(th,r,z)
 %POL2CART Transform polar to Cartesian coordinates.
 %   [X,Y] = POL2CART(TH,R) transforms corresponding elements of data
 %   stored in polar coordinates (angle TH, radius R) to Cartesian

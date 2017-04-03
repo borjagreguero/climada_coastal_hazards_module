@@ -30,7 +30,7 @@
 % ## 2001-02-08 
 % ##    * initial release
 
-function Y = filter2 (B, X, shape)
+function Y = filter2_ch(B, X, shape)
 
 %   if (nargin < 2 || nargin > 3)
 %     usage (['Y = filter2 (B, X [, 'shape'])]);
