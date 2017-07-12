@@ -1,16 +1,7 @@
-function [ACE]= climada_calculate_ACE(tc_track, name_tag, check_printplot)
-% ---------------------------------------------
-%% ACCUMULATED CYCLONE ENERGY ACE
-% % The ACE of a season is calculated by 
-% % summing the squares of the estimated maximum sustained velocity of
-% % - every active tropical storm (wind speed 35 knots (65 km/h) or higher),
-% % - at six-hour intervals. 
-% ---------------------------------------------
-%
-% plot histograms of Accumulated Cyclone Energy ACE, No. of storms per
-% seasons, No. of hurricanes and No. of major hurricanes per season of
-% probabilistic tracks, with historical tracks indicated with dotted black
-% lines
+function ACE= climada_calculate_ACE(tc_track, name_tag, check_printplot)
+% climada template
+% MODULE:
+%   coastal_hazards
 % NAME:
 %   climada_plot_ACE
 % PURPOSE:
@@ -22,6 +13,18 @@ function [ACE]= climada_calculate_ACE(tc_track, name_tag, check_printplot)
 %   - every active tropical storm (wind speed 35 knots (65 km/h) or higher),
 %   - at six-hour intervals. 
 % 
+%   ---------------------------------------------
+%   ACCUMULATED CYCLONE ENERGY ACE
+%	The ACE of a season is calculated by 
+%	summing the squares of the estimated maximum sustained velocity of
+%	- every active tropical storm (wind speed 35 knots (65 km/h) or higher),
+%	- at six-hour intervals. 
+%   ---------------------------------------------
+%
+% plot histograms of Accumulated Cyclone Energy ACE, No. of storms per
+% seasons, No. of hurricanes and No. of major hurricanes per season of
+% probabilistic tracks, with historical tracks indicated with dotted black
+% lines
 %   previous step:  generation of probabilistic tracks, 
 %   tc_track_prob = climada_tc_random_walk_position_windspeed;
 %   next step:      
@@ -41,6 +44,7 @@ function [ACE]= climada_calculate_ACE(tc_track, name_tag, check_printplot)
 % MODIFICATION HISTORY:
 % Lea Mueller, 20110621
 % davids.bresch@gmail.com, 20120407
+% davids.bresch@gmail.com, 20170712, debugged
 %-
 
 global climada_global
@@ -72,24 +76,7 @@ if ~isstruct(tc_track)
     end
 end
 
-
-%% check 6 hours records interval
-unequal_timestep = 0;
-for track_i = 1:length(tc_track)
-    time_step_max = max(tc_track(track_i).TimeStep);
-    time_step_min = min(tc_track(track_i).TimeStep);
-    if time_step_max ~= 6
-        fprintf('time steps are not equal to 6 h, \n check track no %i \n',track_i)
-        tc_track(track_i) = climada_tc_equal_timestep(tc_track(track_i),6);
-        %return
-    end
-    if time_step_min ~= 6
-        fprintf('time steps are not equal to 6 h, \n check track no %i \n',track_i)
-        tc_track(track_i) = climada_tc_equal_timestep(tc_track(track_i),6);
-        %return
-    end
-end
-
+tc_track=climada_tc_equal_timestep(tc_track,6);
     
 %% check wind speed record in knots
 for track_i = 1:length(tc_track)
@@ -132,7 +119,7 @@ seasons_plot(seasons_plot>2012) = seasons_plot(seasons_plot>2012) - 17768;
 
 %% counts and ACE
 season_count = length(seasons);
-ACE          = zeros(season_count,1);
+ACE_val      = zeros(season_count,1);
 TS_count     = zeros(season_count,1);
 Hur_count    = zeros(season_count,1);
 Hur3_count   = zeros(season_count,1);
@@ -145,7 +132,7 @@ for season_i = 1:season_count
         % find max sustained wind greater or equal 35 kn
         v_35kn        = tc_track(season_index(index_i)).MaxSustainedWind(tc_track(season_index(index_i)).MaxSustainedWind >= 35);
         ACE_track_i   = sum(v_35kn.^2)*10^-4;
-        ACE(season_i) = ACE(season_i) + ACE_track_i;
+        ACE_val(season_i) = ACE_val(season_i) + ACE_track_i;
         if tc_track(season_index(index_i)).category>=1
             Hur_count(season_i)  =  Hur_count(season_i) +1;
         end
@@ -156,12 +143,12 @@ for season_i = 1:season_count
     
 end
 
-counts        = [ACE TS_count Hur_count Hur3_count];
+counts        = [ACE_val TS_count Hur_count Hur3_count];
 counts_sorted = sort(counts,'descend');
 counts_max    = max(counts);
 if counts_max(1) > 500; counts_max(1) = 500; end
 
-ACE.ACE = ACE; 
+ACE.ACE = ACE_val; 
 ACE.TS_count = TS_count; 
 ACE.Hur_count = Hur_count; 
 ACE.Hur3_count = Hur3_count; 
