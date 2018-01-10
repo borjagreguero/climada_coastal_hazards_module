@@ -12,9 +12,10 @@ output:
 
 The 'coastal hazards module' is part of 'climada'.
 
-'Climada' and the 'coastal hazards module' is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or at your option) any later version.
+'Climada' and the 'coastal hazards module' are free software: you can redistribute  and/or modify under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or at your option) any later version.
 
 Climada-coastal is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
 See the GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License along with Climada-coastal. If not, see <http://www.gnu.org/licenses/>.
@@ -22,17 +23,17 @@ You should have received a copy of the GNU General Public License along with Cli
 Climada - Coastal Hazards Module
 ====================================================================
 
-# climada_coastal
-additional features for assessing risk in coastal areas (for core climada)
+# General information on climada - coastal
+This module adds features to the core climada for assessing risk in coastal areas (for core climada). 
+
 See ~/docs for documentation.
 
 In order to grant core climada access to this additional modules, create a folder 'modules' in the core climada folder and copy/move the module climada_coastal into climada/modules, without 'climada_' in the filename.
 
 Climada sources all modules' code upon startup. See core climada documentation.
-
 See climada/docs/climada_manual.pdf to get started with core climada and '~/docs/manual_climada_coastal_hazards.docx' to start with climada-coastal.
 
-copyright (c) 2018, Borja G. Reguero, borjagreguero@gmail.com, all rights reserved.
+Copyright (c) 2018, Borja G. Reguero, borjagreguero@gmail.com, all rights reserved.
 
 Author: Borja G. Reguero - borjagreguero@gmail.com - University of California, Santa Cruz
 Co-Author: David N. Bresch, david.bresch@gmail.com
