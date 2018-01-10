@@ -1,4 +1,4 @@
-function wind  = climada_tc_windfield_HURAC(tc_track,track_node_i, LL)
+function wind  = climada_tc_windfield_HURAC(tc_track,track_node_i, LL,gridDensityWind)
 % generates windfield in a grid 
 % NAME:
 %   climada_tc_windfield_HURAC
@@ -37,8 +37,9 @@ if ~exist('LL'         ,'var'), LL=3 ; end % half size of the grid, in degs
 
 %% create a grid with equal spatial resolution (in km) 
 % LL = 3; 
-x=-LL:1/10:LL; % degrees
-y=-LL:1/10:LL; % degrees 
+if ~exist('gridDensityWind','var'), gridDensityWind=1/10; end
+x=-LL:gridDensityWind:LL; % degrees
+y=-LL:gridDensityWind:LL; % degrees 
 [xx0,yy0]=meshgrid(x,y);
 
 %%

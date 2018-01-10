@@ -24,7 +24,9 @@ addpath([climada_coastal_root_dir filesep 'code']);
 % pass the global root directory
 
 climada_global.root_coastal_dir = deblank(climada_coastal_root_dir);
-climada_global.results_coastal_dir = [climada_coastal_root_dir filesep 'results'];
+climada_global.results_coastal_dir      = [climada_coastal_root_dir filesep 'results'];
+climada_global.results_coastal_dir_figs = [climada_global.results_coastal_dir filesep 'figs'];
+
 if not(exist(climada_global.results_coastal_dir)), mkdir(climada_global.results_coastal_dir); end 
 
 climada_global.additional_dir = [climada_coastal_root_dir,filesep,'test']; 
