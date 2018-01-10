@@ -13,14 +13,26 @@ output:
 Climada - Coastal Hazards Module
 ====================================================================
 
-Author: Borja G. Reguero - borjagreguero@gmail.com - University of California, Santa Cruz 
+# climada_coastal
+additional features for assessing risk in coastal areas (for core climada)
+See ~/docs for documentation.
 
-Date of last update: October, 24
+In order to grant core climada access to this additional modules, create a folder 'modules' in the core climada folder and copy/move the module climada_coastal into climada/modules, without 'climada_' in the filename.
 
-'Climada' stands for 'climate adaptation' and is a probabilistic natural catastrophe damage model. Information on the core package can be found at <https://github.com/davidnbresch/climada/wiki>. This module add specific features for coastal zones. 
+Climada sources all modules' code upon startup. See core climada documentation.
+
+See climada/docs/climada_manual.pdf to get started with core climada and '~/docs/manual_climada_coastal_hazards.docx' to start with climada-coastal.
+
+copyright (c) 2018, Borja G. Reguero, borjagreguero@gmail.com, all rights reserved.
+
+Author: Borja G. Reguero - borjagreguero@gmail.com - University of California, Santa Cruz
+Co-Author: David N. Bresch, david.bresch@gmail.com
+
 
 # Description
-This module adds specific functions to the climada suite that are particularly interesting for coastal areas and coastal risks. The functions and tools in this module work with the climada main core functions and applications (i.e. you need to have climada installed). 
+'Climada' stands for 'climate adaptation' and is a probabilistic natural catastrophe damage model. Information on the core package can be found at <https://github.com/davidnbresch/climada/wiki>. 
+
+This module adds specific functions to the climada suite that are particularly interesting for coastal areas and coastal risks. The functions and tools in this module work with the climada main core functions and applications (i.e. you need to have climada installed).
 
 Some functions have been modified from core climada original functions and adapted to more user specific needs and further customization. 
 
@@ -53,17 +65,16 @@ This entity curves represent the socioeconomic exposure curves must be calculate
 
 Other functions help to plot and save figures, help with different operations and add capabilities that can be used outside climada. Some examples follow: 
 - save figures in different formats and resolutions 
-- calculate long term trends 
-- accumulated cyclone energy calculation 
-- self organizing maps toolbox and examples (requires installing aux_modules)
-- save matlab data from ascii format to raster (requires installing aux_modules)
-- other wave climate tools for multivariate climate analysis (requires installing aux_modules) 
+- calculate long term trends
+- accumulated cyclone energy calculation
+- self organizing maps toolbox and examples (requires installing aux_modules, not yet available)
+- save matlab data from ascii format to raster (requires installing aux_modules, not yet available)
+- other wave climate tools for multivariate climate analysis (requires installing aux_modules, not yet available)
 
-# Data for the module 
-The module includes the require data to calculate waves and surges from cyclones, as well as sea level rise estimates. However, for astronomical tides and elevation data, consult the document 'README_to_download_data.md' to see how to download and save data in a 
+# Data for the module
+The module includes the require data to calculate waves and surges from cyclones, as well as sea level rise estimates. However, for astronomical tides and elevation data, consult the document 'README_to_download_data.md' to see how to download and save data in a
 
-
-# How to use 
+# How to use
 
 ## A. Hazard Simulation
 
