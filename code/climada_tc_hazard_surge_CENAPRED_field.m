@@ -178,8 +178,8 @@ res.surge = repmat(res.lon(:).*nan,1,track_nodes_count-1);
 spatial_lag=1; % jump some track nodes   
 deg=180/pi;
 
-r  = 0.50;   circle = 0:0.1:2*pi+0.1; [x,y] = pol2cart(circle,r);
-r2 = 0.02;   circle2 = 0:0.1:2*pi+0.1; [x2,y2] = pol2cart(circle2,r2);
+r  = 0.50;   circle = 0:0.1:2*pi+0.1; [x,y] = pol2cart_ch(circle,r);
+r2 = 0.02;   circle2 = 0:0.1:2*pi+0.1; [x2,y2] = pol2cart_ch(circle2,r2);
 
 try 
     coast = load([climada_global.coastline_file]); 

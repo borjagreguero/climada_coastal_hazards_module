@@ -8,12 +8,12 @@ function EDS=climada_EDS_calc_coastal(entity,hazard,annotation_name,force_re_enc
 %   to include more types of buildings, prepare a loop outside this
 %   function, the same way that is done for adapation measures. 
 % NAME:
-%   climada_EDS_calc
+%   climada_EDS_calc_coastal
 % PURPOSE:
 %   given an encoded entity (assets and damage functions) and a hazard
 %   event set, calculate the event damage set (EDS). The event damage set
 %   contains the event damage for each hazard event. In case you set
-%   climada_global.EDS_at_centroid=1, the damage is also stored for each
+%   climada_global.damage_at_centroid=1, the damage is also stored for each
 %   event at each centroids (be aware of memory implications). The exepcted
 %   damage is always stored at each centroid, see EDS.ED_at_centroid.
 %
@@ -73,6 +73,7 @@ function EDS=climada_EDS_calc_coastal(entity,hazard,annotation_name,force_re_enc
 %       annotation_name: a kind of default title (sometimes empty)
 % MODIFICATION HISTORY:
 % Borja G. Reguero - borjagreguero@gmail.com - creation 
+% David N. Bresch, david.bresch@gmail.com, 20170107, EDS_at_centroid renamed to damage_at_centroid
 %-
 global climada_global
 if ~climada_init_vars,return;end % init/import global variables
@@ -156,7 +157,7 @@ EDS.ED                = zeros(1,1);
 EDS.ED_bytp_by_elevation = zeros(Ntypes,Nelev);
 
 n_assets                 = Ncentroids;
-if climada_global.EDS_at_centroid
+if climada_global.damage_at_centroid
     EDS.damage_at_centroid  = zeros(Ncentroids,Nstorms);
     EDS.ED_at_centroid      = zeros(n_assets,1); % expected damage per centroid
     EDS.ED_at_centroid_bytp = zeros(n_assets,Ntypes); % expected damage per centroid
@@ -207,7 +208,7 @@ for type = 1:Ntypes
     
     % save entity value to calculate damages relative to Value by elevation 
 %     EDS.assets.Value_at_centroid_bytp(type).Value= entity.assets.Value; 
-    if climada_global.EDS_at_centroid
+    if climada_global.damage_at_centroid
         EDS.damage_at_centroid          = EDS.damage_at_centroid + full(EDSi.damage_at_centroid); 
         EDS.ED_at_centroid_bytp(:,type) = EDSi.ED_at_centroid;
         EDS.Value_at_centroid           = EDS.Value_at_centroid + entity.assets.Value; 
@@ -247,7 +248,7 @@ end
 EDS.annotation_name = annotation_name;
 % to validate 
 EDS.ED2              = full(sum(EDS.damage.*EDS.frequency)); % calculate annual expected damage
-if climada_global.EDS_at_centroid
+if climada_global.damage_at_centroid
 %     EDS.damage_at_centroid = sparse(i,j,x,hazard.event_count,n_assets);
 %     EDS.damage_at_centroid = EDS.damage_at_centroid';
     EDS.ED_at_centroid     = full(sum(bsxfun(@times, EDS.damage_at_centroid, EDS.frequency),2));

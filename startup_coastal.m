@@ -66,6 +66,6 @@ fprintf('initializing climada_coastal... ');
 climada_init_vars_coastal; 
 
 % fprintf('Activating EDS at centroids... ');
-% climada_global.EDS_at_centroid = 1; 
+% climada_global.damage_at_centroid = 1; 
 
 fprintf('done\n');
